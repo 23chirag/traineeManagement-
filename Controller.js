@@ -222,34 +222,40 @@ const getTraineePrograms = async (req, res) => {
     }
 };
 
-// Update addTrainee to accept college, branch, year, and photo (file upload)
+// Update addTrainee to use trainee_prog_id
 const addTrainee = async (req, res) => {
+    const { name, email, mobile, internship_id, instructor_id, trainee_program_id } = req.body;
+    if (!name || !email || !mobile || !internship_id || !instructor_id || !trainee_program_id) {
+        return res.status(400).json({ error: "All fields are required" });
+    }
     try {
-        const { name, email, mobile, college, branch, year, internship_id, instructor_id, trainee_program_id } = req.body;
-        let photoPath = '';
-        if (req.files && req.files['photo'] && req.files['photo'][0]) {
-            const photoFile = req.files['photo'][0];
-            photoPath = `photos/${photoFile.filename}`;
+        // Find the internship_transaction row for this trainee program
+        const [transaction] = await sequelize.query(
+            "SELECT * FROM internship_transaction WHERE internship_id = ? AND instructor_id = ? AND trainee_prog_id = ?",
+            { replacements: [internship_id, instructor_id, trainee_program_id], type: QueryTypes.SELECT }
+        );
+        if (!transaction) {
+            return res.status(400).json({ error: "No internship transaction found for this internship, instructor, and trainee program." });
         }
-        if (!name || !email || !mobile || !internship_id || !instructor_id || !trainee_program_id || !college || !branch || !year) {
-            return res.status(400).json({ error: 'All fields are required' });
+        if (transaction.trainee_id) {
+            return res.status(400).json({ error: "A trainee is already mapped to this trainee program." });
         }
-        // Insert into trainees table (add columns if needed)
+        // Insert trainee
         const [result, meta] = await sequelize.query(
-            'INSERT INTO trainees (name, email, mobileNo, college, branch, year, photo) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            { replacements: [name, email, mobile, college, branch, year, photoPath], type: QueryTypes.INSERT }
+            "INSERT INTO trainees (name, email, mobileNo) VALUES (?, ?, ?)",
+            { replacements: [name, email, mobile], type: QueryTypes.INSERT }
         );
-        // Get the new trainee's id
-        const traineeId = meta && meta.insertId ? meta.insertId : (Array.isArray(result) ? result[0] : result);
-        // Map trainee to trainee_program_id in internship_transaction
-        await sequelize.query(
-            'INSERT INTO internship_transaction (internship_id, instructor_id, trainee_prog_id, trainee_id) VALUES (?, ?, ?, ?)',
-            { replacements: [internship_id, instructor_id, trainee_program_id, traineeId], type: QueryTypes.INSERT }
+        const trainee_id = meta && meta.insertId ? meta.insertId : (Array.isArray(result) ? result[0] : result);
+        // Update internship_transaction to set trainee_id for this trainee program
+        const [updateResult] = await sequelize.query(
+            "UPDATE internship_transaction SET trainee_id = ? WHERE internship_id = ? AND instructor_id = ? AND trainee_prog_id = ?",
+            { replacements: [trainee_id, internship_id, instructor_id, trainee_program_id], type: QueryTypes.UPDATE }
         );
-        res.json({ success: true, message: 'Trainee added successfully' });
+        console.log('Updated internship_transaction for trainee:', updateResult);
+        res.json({ success: true, message: "Trainee added and mapped successfully" });
     } catch (err) {
-        console.error('Database error in addTrainee:', err);
-        res.status(500).json({ error: 'Internal server error: ' + err.message });
+        console.error("Database error in addTrainee:", err);
+        res.status(500).json({ error: "Internal server error: " + err.message });
     }
 };
 
@@ -358,21 +364,22 @@ const getMyTraineePrograms = async (req, res) => {
     }
 };
 
-// Update addTask to use 'description' instead of 'taskDescription'
+// Add Task
 const addTask = async (req, res) => {
-    const { project_id, taskTitle, description, startDate, endDate } = req.body;
-    if (!project_id || !taskTitle || !startDate || !endDate) {
-        return res.status(400).json({ error: 'All fields except description are required' });
+    const { title, startDate, endDate, project_id } = req.body;
+    if (!title || !startDate || !endDate || !project_id) {
+        return res.status(400).json({ error: "All fields are required" });
     }
     try {
-        await sequelize.query(
-            'INSERT INTO tasks (project_id, taskTitle, description, startDate, endDate) VALUES (?, ?, ?, ?, ?)',
-            { replacements: [project_id, taskTitle, description || '', startDate, endDate], type: QueryTypes.INSERT }
+        // Insert into tasks table with default status
+        const result = await sequelize.query(
+            "INSERT INTO tasks (taskTitle, startDate, endDate, project_id, status) VALUES (?, ?, ?, ?, 'assigned')",
+            { replacements: [title, startDate, endDate, project_id], type: QueryTypes.INSERT }
         );
-        res.json({ success: true, message: 'Task added successfully' });
+        res.json({ success: true, message: "Task added successfully" });
     } catch (err) {
-        console.error('Database error in addTask:', err);
-        res.status(500).json({ error: 'Internal server error: ' + err.message });
+        console.error("Database error in addTask:", err);
+        res.status(500).json({ error: "Database error" });
     }
 };
 
@@ -607,84 +614,4 @@ const sendAttendanceByEmail = async (req, res) => {
     }
 };
 
-// Get project details by id
-const getProjectDetails = async (req, res) => {
-    const { project_id } = req.query;
-    if (!project_id) {
-        return res.status(400).json({ error: 'project_id is required' });
-    }
-    try {
-        const [project] = await sequelize.query(
-            'SELECT * FROM projects WHERE id = ?',
-            { replacements: [project_id], type: QueryTypes.SELECT }
-        );
-        if (!project) {
-            return res.status(404).json({ error: 'Project not found' });
-        }
-        res.json(project);
-    } catch (err) {
-        console.error('Database error in getProjectDetails:', err);
-        res.status(500).json({ error: 'Internal server error: ' + err.message });
-    }
-};
-
-// Get trainee details by id
-const getTraineeDetails = async (req, res) => {
-    const { trainee_id } = req.query;
-    if (!trainee_id) {
-        return res.status(400).json({ error: 'trainee_id is required' });
-    }
-    try {
-        const [trainee] = await sequelize.query(
-            'SELECT * FROM trainees WHERE id = ?',
-            { replacements: [trainee_id], type: QueryTypes.SELECT }
-        );
-        if (!trainee) {
-            return res.status(404).json({ error: 'Trainee not found' });
-        }
-        res.json(trainee);
-    } catch (err) {
-        console.error('Database error in getTraineeDetails:', err);
-        res.status(500).json({ error: 'Internal server error: ' + err.message });
-    }
-};
-
-// Get trainee details by project id
-const getTraineeByProjectId = async (req, res) => {
-    const { project_id } = req.query;
-    if (!project_id) {
-        return res.status(400).json({ error: 'project_id is required' });
-    }
-    try {
-        // 1. Get tr_id from projects
-        const [project] = await sequelize.query(
-            'SELECT tr_id FROM projects WHERE id = ?',
-            { replacements: [project_id], type: QueryTypes.SELECT }
-        );
-        if (!project || !project.tr_id) {
-            return res.status(404).json({ error: 'Project or trainee program not found' });
-        }
-        // 2. Get trainee_id from internship_transaction using tr_id
-        const [transaction] = await sequelize.query(
-            'SELECT trainee_id FROM internship_transaction WHERE trainee_prog_id = ?',
-            { replacements: [project.tr_id], type: QueryTypes.SELECT }
-        );
-        if (!transaction || !transaction.trainee_id) {
-            return res.status(404).json({ error: 'Trainee not mapped to this project' });
-        }
-        // 3. Get trainee details from trainees table
-        const [trainee] = await sequelize.query(
-            'SELECT * FROM trainees WHERE id = ?',
-            { replacements: [transaction.trainee_id], type: QueryTypes.SELECT }
-        );
-        if (!trainee) {
-            return res.status(404).json({ error: 'Trainee not found' });
-        }
-        res.json(trainee);
-    } catch (err) {
-        console.error('Database error in getTraineeByProjectId:', err);
-        res.status(500).json({ error: 'Internal server error: ' + err.message });
-    }
-};
-
-module.exports = { uploadFile,insLogin,addInternshipProgram, getAllInternshipPrograms, addInstructorToProgram, getInstructorsForProgram, getMyPrograms, addTrainee, addProject, getAllTrainees, getAllProjects, getDashboardData, addTraineeProgram, getTraineePrograms, getMyTraineePrograms, adminLogin, addTask, getTasks, updateTaskStatus, getProjectsForTraineeProgram, getUniqueTraineesForProgram, checkProjectFileStatus, uploadAttendance, sendAttendanceByEmail, getProjectDetails, getTraineeDetails, getTraineeByProjectId };
+module.exports = { uploadFile,insLogin,addInternshipProgram, getAllInternshipPrograms, addInstructorToProgram, getInstructorsForProgram, getMyPrograms, addTrainee, addProject, getAllTrainees, getAllProjects, getDashboardData, addTraineeProgram, getTraineePrograms, getMyTraineePrograms, adminLogin, addTask, getTasks, updateTaskStatus, getProjectsForTraineeProgram, getUniqueTraineesForProgram, checkProjectFileStatus, uploadAttendance, sendAttendanceByEmail };

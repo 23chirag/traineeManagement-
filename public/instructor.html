@@ -668,7 +668,7 @@
 
     <footer class="main-footer">
         <div class="footer-content">
-            &copy; 2025 Instructor Portal. All rights reserved.
+            &copy; 2024 Admin Portal. All rights reserved.
         </div>
     </footer>
 
@@ -787,8 +787,6 @@ async function fetchAndRenderTraineePrograms() {
             btn.addEventListener('click', async function() {
                 const traineeProgId = this.getAttribute('data-trainee-program-id');
                 if (!traineeProgId) return;
-                const confirmed = confirm('Are you sure you want to submit?');
-                if (!confirmed) return;
                 try {
                     const res = await fetch('http://localhost:8000/instructor/sendAttendanceByEmail', {
                         method: 'POST',

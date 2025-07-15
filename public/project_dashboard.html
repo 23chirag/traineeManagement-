@@ -448,49 +448,17 @@
             padding: 8px 0;
             margin-bottom: 8px;
         }
-        /* In the Add Task modal, increase modal-content width and textarea size */
-        #addTaskModal .modal-content {
-            min-width: 420px;
-            max-width: 540px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        #addTaskForm textarea#description {
-            min-height: 100px;
-            width: 100%;
-            resize: vertical;
-            font-size: 1.08rem;
-            padding: 10px 12px;
-            box-sizing: border-box;
-            margin-bottom: 18px;
-        }
-        #addTaskForm input, #addTaskForm textarea {
-            box-sizing: border-box;
-        }
     </style>
 </head>
 <body>
     <div class="container" style="position: relative;">
         <button id="backToDashboardBtn" style="position: absolute; top: 18px; left: 18px; background: #e7eefe; color: #2575fc; font-size: 1rem; font-weight: 500; border: none; border-radius: 6px; padding: 6px 16px; box-shadow: 0 1px 4px rgba(127,156,245,0.07); cursor: pointer; transition: background 0.18s, color 0.18s; min-width: unset;">← Back</button>
         <!-- Project Overview Section -->
-        <div class="section project-overview" style="display: flex; flex-direction: row; gap: 32px; align-items: stretch;">
-            <div style="flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center;">
-                <div class="project-details-card" style="width: 100%; max-width: 500px; min-width: 220px; max-height: 260px; overflow-y: auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #0001; padding: 32px 36px; display: flex; flex-direction: column;">
-                    <h1 id="projectName" style="margin-top:0; margin-bottom:18px; color:#2575fc; font-size:2rem;">E-Commerce Platform Development</h1>
-                    <p id="projectDescription" style="color:#222; font-size:1.15rem; margin:0;">
-                        A comprehensive e-commerce platform with user authentication, product catalog, shopping cart functionality, payment integration, and admin dashboard. The project aims to create a modern, responsive web application that provides seamless shopping experience for customers and efficient management tools for administrators.
-                    </p>
-                </div>
-            </div>
-            <div style="flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center;">
-                <div class="trainee-details-card" style="width: 100%; max-width: 400px; min-width: 220px; max-height: 260px; overflow-y: auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #0001; padding: 24px 28px; display: flex; flex-direction: column;">
-                    <h2 style="margin-top:0; margin-bottom:18px; color:#2575fc; font-size:1.25rem;">Trainee Details</h2>
-                    <div id="traineeDetailsForm">
-                        <!-- Trainee details will be loaded here -->
-                        <div style="text-align:center; color:#aaa;">Loading...</div>
-                    </div>
-                </div>
-            </div>
+        <div class="section project-overview">
+            <h1 id="projectName">E-Commerce Platform Development</h1>
+            <p id="projectDescription">
+                A comprehensive e-commerce platform with user authentication, product catalog, shopping cart functionality, payment integration, and admin dashboard. The project aims to create a modern, responsive web application that provides seamless shopping experience for customers and efficient management tools for administrators.
+            </p>
         </div>
 
         <!-- Task Management Section -->
@@ -541,12 +509,13 @@
             <form class="modal-form" id="addTaskForm">
                 <label for="taskTitle">Task Title</label>
                 <input type="text" id="taskTitle" name="taskTitle" required />
-                <label for="description">Task Description</label>
-                <textarea id="description" name="description" placeholder="Enter task description..." required></textarea>
+                
                 <label for="startDate">Start Date</label>
                 <input type="date" id="startDate" name="startDate" required />
+                
                 <label for="endDate">End Date</label>
                 <input type="date" id="endDate" name="endDate" required />
+                
                 <button type="submit" class="submit-btn">Add Task</button>
             </form>
         </div>
@@ -609,7 +578,6 @@
         addTaskForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             let taskTitle = document.getElementById('taskTitle').value;
-            let description = document.getElementById('description').value;
             let startDate = document.getElementById('startDate').value;
             let endDate = document.getElementById('endDate').value;
             // Convert dates to yyyy-mm-dd if needed
@@ -630,7 +598,6 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         title: taskTitle,
-                        description: description,
                         startDate,
                         endDate,
                         project_id
@@ -900,41 +867,7 @@
                 taskTableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#e74c3c;">Failed to load tasks.</td></tr>';
             }
         }
-//function to load trainee data
-async function loadTraineeData() {
-    const trainee_id = localStorage.getItem('trainee_id');
-    const detailsDiv = document.getElementById('traineeDetailsForm');
-    if (trainee_id) {
-        try {
-            const res = await fetch(`http://localhost:8000/instructor/traineeDetails?trainee_id=${encodeURIComponent(trainee_id)}`);
-            const trainee = await res.json();
-            if (trainee && !trainee.error) {
-                console.log('Rendering trainee:', trainee);
-                detailsDiv.innerHTML = `
-                    <div style="display:flex; flex-direction:column; gap:12px; color:#222; align-items:center;">
-                        <div style="margin-bottom:12px;">
-                            <img src="${trainee.photo ? trainee.photo.replace(/^photos\//, 'photos/') : 'https://via.placeholder.com/100?text=Photo'}" alt="Trainee Photo" style="width:100px; height:100px; object-fit:cover; border-radius:8px; border:1.5px solid #b2c7e6; background:#f7fafc;" />
-                        </div>
-                        <div><strong>ID:</strong> <span>${trainee.id || ''}</span></div>
-                        <div><strong>Name:</strong> <span>${trainee.name || ''}</span></div>
-                        <div><strong>Email:</strong> <span>${trainee.email || ''}</span></div>
-                        <div><strong>Mobile:</strong> <span>${trainee.mobileNo || trainee.mobile || ''}</span></div>
-                        <div><strong>College:</strong> <span>${trainee.college || ''}</span></div>
-                        <div><strong>Branch:</strong> <span>${trainee.branch || ''}</span></div>
-                        <div><strong>Year:</strong> <span>${trainee.year || ''}</span></div>
-                    </div>
-                `;
-            } else {
-                detailsDiv.innerHTML = '<div style="text-align:center; color:#aaa;">No trainee found for this ID.</div>';
-            }
-        } catch (err) {
-            detailsDiv.innerHTML = '<div style="text-align:center; color:#e74c3c;">Failed to load trainee details.</div>';
-            console.error('Error loading trainee details:', err);
-        }
-    } else {
-        detailsDiv.innerHTML = '<div style="text-align:center; color:#aaa;">No trainee selected.</div>';
-    }
-}
+
         // Function to load project data
         async function loadProjectData() {
             const project_id = localStorage.getItem('project_id');
@@ -949,14 +882,6 @@ async function loadTraineeData() {
                     window.projectEndDate = project.endDate.split('T')[0];
                 } else {
                     window.projectEndDate = null;
-                }
-                // Set project description dynamically
-                if (project && project.description) {
-                    document.getElementById('projectDescription').textContent = project.description;
-                }
-                // Optionally set project name/title as well
-                if (project && project.title) {
-                    document.getElementById('projectName').textContent = project.title;
                 }
             } catch (err) {
                 window.projectEndDate = null;
@@ -985,7 +910,6 @@ async function loadTraineeData() {
         // Also check on page load and after adding a new task
         document.addEventListener('DOMContentLoaded', async function() {
             await loadProjectData();
-            await loadTraineeData();
             checkAndUpdateOverdueTasks(); // This will also reload the tasks
             turnInBtn.disabled = false;
         });

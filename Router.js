@@ -42,7 +42,7 @@ const attendanceUpload = multer({
         cb(null, true);
     }
 });
-const { adminLogin,checkProjectFileStatus, insLogin, addInternshipProgram, addTraineeProgram, getAllInternshipPrograms, addInstructorToProgram, getInstructorsForProgram, addTrainee, addProject, getAllTrainees, getAllProjects, getDashboardData, getTraineePrograms, addTask, getTasks, updateTaskStatus, getProjectsForTraineeProgram, getUniqueTraineesForProgram, uploadFile, uploadAttendance, sendAttendanceByEmail, getProjectDetails, getTraineeDetails, getTraineeByProjectId } = require("./Controller");
+const { adminLogin,checkProjectFileStatus, insLogin, addInternshipProgram, addTraineeProgram, getAllInternshipPrograms, addInstructorToProgram, getInstructorsForProgram, addTrainee, addProject, getAllTrainees, getAllProjects, getDashboardData, getTraineePrograms, addTask, getTasks, updateTaskStatus, getProjectsForTraineeProgram, getUniqueTraineesForProgram, uploadFile, uploadAttendance, sendAttendanceByEmail } = require("./Controller");
 const { sequelize } = require('./dbConnect');
 
 const router = express.Router();
@@ -55,25 +55,8 @@ router.post('/instructor/addInternshipProgram', addInternshipProgram);
 // Add Instructor to Program
 router.post('/instructor/addInstructorToProgram', addInstructorToProgram);
 
-// Ensure photos directory exists
-const photosDir = path.join(__dirname, 'photos');
-if (!fs.existsSync(photosDir)) {
-    fs.mkdirSync(photosDir);
-}
-
-// Multer storage for trainee photos
-const photoStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, photosDir);
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
-    }
-});
-const photoUpload = multer({ storage: photoStorage });
-
 // Add Trainee
-router.post('/instructor/addTrainee', photoUpload.fields([{ name: 'photo', maxCount: 1 }]), addTrainee);
+router.post('/instructor/addTrainee', addTrainee);
 // Add Project
 router.post('/instructor/addProject', addProject);
 
@@ -115,15 +98,6 @@ router.get('/instructor/tasks', getTasks);
 
 // Update task status
 router.put('/instructor/updateTaskStatus', updateTaskStatus);
-
-// Get project details by id
-router.get('/instructor/projectDetails', getProjectDetails);
-
-// Get trainee details by id
-router.get('/instructor/traineeDetails', getTraineeDetails);
-
-// Get trainee details by project id
-router.get('/instructor/traineeByProject', getTraineeByProjectId);
 
 // Admin login route
 router.post('/admin/login', adminLogin);
