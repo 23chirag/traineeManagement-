@@ -724,10 +724,6 @@ addTraineeProgramForm.addEventListener('submit', async function(e) {
     const startDate = document.getElementById('traineeProgramStart').value;
     const endDate = document.getElementById('traineeProgramEnd').value;
     // Always use the IDs from localStorage
-    if (!internshipId || internshipId === 'null') {
-        alert('No internship program selected. Please log in again or select a program.');
-        return;
-    }
     try {
         const res = await fetch('http://localhost:8000/instructor/addTraineeProgram', {
             method: 'POST',

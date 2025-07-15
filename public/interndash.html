@@ -390,7 +390,6 @@
                     <tr>
                         <th>Project ID</th>
                         <th>Title</th>
-                        <th>Description</th>
                         <th>Start Date</th>
                         <th>End Date</th>
                         <th>View</th>
@@ -403,17 +402,36 @@
             </table>
         </div>
     </div>
+    <!-- Add Trainee Modal -->
     <div id="addTraineeModal" class="modal-overlay">
         <div class="modal-content">
             <button class="close-modal" id="closeAddTraineeModalBtn">&times;</button>
             <h3>Add Trainee</h3>
-            <form class="modal-form" id="addTraineeForm">
-                <label for="traineeName">Name</label>
-                <input type="text" id="traineeName" name="traineeName" required />
-                <label for="traineeEmail">Email</label>
-                <input type="email" id="traineeEmail" name="traineeEmail" required />
+            <form class="modal-form" id="addTraineeForm" enctype="multipart/form-data">
+                <div style="display: flex; flex-direction: row; align-items: flex-start; gap: 24px; margin-bottom: 18px;">
+                    <div style="flex: 2; display: flex; flex-direction: column; gap: 10px;">
+                        <label for="traineeName">Name</label>
+                        <input type="text" id="traineeName" name="name" required />
+                        <label for="traineeEmail">Email</label>
+                        <input type="email" id="traineeEmail" name="email" required />
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        <label for="traineePhoto" style="margin-bottom: 4px;">Photo</label>
+                        <div id="photoBox" style="width: 100px; height: 100px; border: 1.5px dashed #b2c7e6; border-radius: 8px; background: #f7fafc; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden;">
+                            <span id="photoPlaceholder" style="color: #b2c7e6; font-size: 1.8rem;">+</span>
+                            <img id="photoPreview" src="" alt="Preview" style="display: none; width: 100%; height: 100%; object-fit: cover;" />
+                        </div>
+                        <input type="file" id="traineePhoto" name="photo" accept="image/*" required style="display: none;" />
+                    </div>
+                </div>
                 <label for="traineeMobile">Mobile Number</label>
-                <input type="text" id="traineeMobile" name="traineeMobile" required />
+                <input type="text" id="traineeMobile" name="mobileNo" required />
+                <label for="traineeCollege">College Name</label>
+                <input type="text" id="traineeCollege" name="college" required />
+                <label for="traineeBranch">Branch</label>
+                <input type="text" id="traineeBranch" name="branch" required />
+                <label for="traineeYear">Year</label>
+                <input type="number" id="traineeYear" name="year" min="1" max="4" required />
                 <button type="submit" class="submit-btn">Add Trainee</button>
             </form>
         </div>
@@ -498,17 +516,21 @@
         const addTraineeForm = document.getElementById('addTraineeForm');
         addTraineeForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const name = document.getElementById('traineeName').value;
-            const email = document.getElementById('traineeEmail').value;
-            const mobile = document.getElementById('traineeMobile').value;
-            const internship_id = localStorage.getItem('internship_id');
-            const instructor_id = localStorage.getItem('instructor_id');
-            const trainee_program_id = localStorage.getItem('trainee_program_id');
+            const formData = new FormData();
+            formData.append('name', document.getElementById('traineeName').value);
+            formData.append('email', document.getElementById('traineeEmail').value);
+            formData.append('mobile', document.getElementById('traineeMobile').value);
+            formData.append('college', document.getElementById('traineeCollege').value);
+            formData.append('branch', document.getElementById('traineeBranch').value);
+            formData.append('year', document.getElementById('traineeYear').value);
+            formData.append('photo', document.getElementById('traineePhoto').files[0]);
+            formData.append('internship_id', localStorage.getItem('internship_id'));
+            formData.append('instructor_id', localStorage.getItem('instructor_id'));
+            formData.append('trainee_program_id', localStorage.getItem('trainee_program_id'));
             try {
                 const res = await fetch('http://localhost:8000/instructor/addTrainee', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, mobile, internship_id, instructor_id, trainee_program_id })
+                    body: formData
                 });
                 const result = await res.json();
                 if (result.success) {
@@ -594,7 +616,6 @@
                         <tr>
                             <td>${p.id || ''}</td>
                             <td>${p.title || ''}</td>
-                            <td>${p.description || ''}</td>
                             <td>${p.startDate ? p.startDate.split('T')[0] : ''}</td>
                             <td>${p.endDate ? p.endDate.split('T')[0] : ''}</td>
                             <td><button class="view-btn" onclick="viewProject('${p.id}', this, '${p.tr_id}')">View</button></td>
@@ -659,13 +680,54 @@
         if (traineeProgramId) {
             localStorage.setItem('trainee_program_id', traineeProgramId);
         }
-        // Animate fade-out on the container like the back button
-        const container = document.querySelector('.container');
-        container.classList.add('fade-out');
-        setTimeout(function() {
-            window.location.href = `project_dashboard.html?projectId=${encodeURIComponent(projectId)}`;
-        }, 250);
+        // Fetch trainee_id for this project and store in localStorage
+        fetch(`http://localhost:8000/instructor/traineeByProject?project_id=${encodeURIComponent(projectId)}`)
+            .then(res => res.json())
+            .then(trainee => {
+                if (trainee && trainee.id) {
+                    localStorage.setItem('trainee_id', trainee.id);
+                } else {
+                    localStorage.removeItem('trainee_id');
+                }
+                // Animate fade-out on the container like the back button
+                const container = document.querySelector('.container');
+                container.classList.add('fade-out');
+                setTimeout(function() {
+                    window.location.href = `project_dashboard.html?projectId=${encodeURIComponent(projectId)}`;
+                }, 250);
+            })
+            .catch(() => {
+                localStorage.removeItem('trainee_id');
+                const container = document.querySelector('.container');
+                container.classList.add('fade-out');
+                setTimeout(function() {
+                    window.location.href = `project_dashboard.html?projectId=${encodeURIComponent(projectId)}`;
+                }, 250);
+            });
     }
     </script>
+    <script>
+// Custom photo box logic
+const photoBox = document.getElementById('photoBox');
+const traineePhotoInput = document.getElementById('traineePhoto');
+const photoPreview = document.getElementById('photoPreview');
+const photoPlaceholder = document.getElementById('photoPlaceholder');
+photoBox.addEventListener('click', () => traineePhotoInput.click());
+traineePhotoInput.addEventListener('change', function() {
+    if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            photoPreview.src = e.target.result;
+            photoPreview.style.display = 'block';
+            photoPlaceholder.style.display = 'none';
+        };
+        reader.readAsDataURL(this.files[0]);
+    } else {
+        photoPreview.src = '';
+        photoPreview.style.display = 'none';
+        photoPlaceholder.style.display = 'block';
+    }
+});
+</script>
 </body>
 </html> 

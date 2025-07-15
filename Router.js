@@ -55,8 +55,25 @@ router.post('/instructor/addInternshipProgram', addInternshipProgram);
 // Add Instructor to Program
 router.post('/instructor/addInstructorToProgram', addInstructorToProgram);
 
+// Ensure photos directory exists
+const photosDir = path.join(__dirname, 'photos');
+if (!fs.existsSync(photosDir)) {
+    fs.mkdirSync(photosDir);
+}
+
+// Multer storage for trainee photos
+const photoStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, photosDir);
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+const photoUpload = multer({ storage: photoStorage });
+
 // Add Trainee
-router.post('/instructor/addTrainee', addTrainee);
+router.post('/instructor/addTrainee', photoUpload.fields([{ name: 'photo', maxCount: 1 }]), addTrainee);
 // Add Project
 router.post('/instructor/addProject', addProject);
 

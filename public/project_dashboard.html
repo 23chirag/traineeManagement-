@@ -453,6 +453,7 @@
             min-width: 420px;
             max-width: 540px;
             width: 100%;
+            box-sizing: border-box;
         }
         #addTaskForm textarea#description {
             min-height: 100px;
@@ -460,6 +461,11 @@
             resize: vertical;
             font-size: 1.08rem;
             padding: 10px 12px;
+            box-sizing: border-box;
+            margin-bottom: 18px;
+        }
+        #addTaskForm input, #addTaskForm textarea {
+            box-sizing: border-box;
         }
     </style>
 </head>
@@ -905,11 +911,17 @@ async function loadTraineeData() {
             if (trainee && !trainee.error) {
                 console.log('Rendering trainee:', trainee);
                 detailsDiv.innerHTML = `
-                    <div style="display:flex; flex-direction:column; gap:12px; color:#222;">
+                    <div style="display:flex; flex-direction:column; gap:12px; color:#222; align-items:center;">
+                        <div style="margin-bottom:12px;">
+                            <img src="${trainee.photo ? trainee.photo.replace(/^photos\//, 'photos/') : 'https://via.placeholder.com/100?text=Photo'}" alt="Trainee Photo" style="width:100px; height:100px; object-fit:cover; border-radius:8px; border:1.5px solid #b2c7e6; background:#f7fafc;" />
+                        </div>
                         <div><strong>ID:</strong> <span>${trainee.id || ''}</span></div>
                         <div><strong>Name:</strong> <span>${trainee.name || ''}</span></div>
                         <div><strong>Email:</strong> <span>${trainee.email || ''}</span></div>
                         <div><strong>Mobile:</strong> <span>${trainee.mobileNo || trainee.mobile || ''}</span></div>
+                        <div><strong>College:</strong> <span>${trainee.college || ''}</span></div>
+                        <div><strong>Branch:</strong> <span>${trainee.branch || ''}</span></div>
+                        <div><strong>Year:</strong> <span>${trainee.year || ''}</span></div>
                     </div>
                 `;
             } else {

@@ -59,9 +59,6 @@ const insLogin = async (req, res) => {
             }
         );
         const internship_id = transaction ? transaction.internship_id : null;
-        if (!internship_id) {
-            return res.status(400).json({ error: "No internship program assigned to this instructor. Please contact admin." });
-        }
         // Return instructor data along with internship_id
         res.json({
             success: true, 
@@ -225,40 +222,34 @@ const getTraineePrograms = async (req, res) => {
     }
 };
 
-// Update addTrainee to use trainee_prog_id
+// Update addTrainee to accept college, branch, year, and photo (file upload)
 const addTrainee = async (req, res) => {
-    const { name, email, mobile, internship_id, instructor_id, trainee_program_id } = req.body;
-    if (!name || !email || !mobile || !internship_id || !instructor_id || !trainee_program_id) {
-        return res.status(400).json({ error: "All fields are required" });
-    }
     try {
-        // Find the internship_transaction row for this trainee program
-        const [transaction] = await sequelize.query(
-            "SELECT * FROM internship_transaction WHERE internship_id = ? AND instructor_id = ? AND trainee_prog_id = ?",
-            { replacements: [internship_id, instructor_id, trainee_program_id], type: QueryTypes.SELECT }
-        );
-        if (!transaction) {
-            return res.status(400).json({ error: "No internship transaction found for this internship, instructor, and trainee program." });
+        const { name, email, mobile, college, branch, year, internship_id, instructor_id, trainee_program_id } = req.body;
+        let photoPath = '';
+        if (req.files && req.files['photo'] && req.files['photo'][0]) {
+            const photoFile = req.files['photo'][0];
+            photoPath = `photos/${photoFile.filename}`;
         }
-        if (transaction.trainee_id) {
-            return res.status(400).json({ error: "A trainee is already mapped to this trainee program." });
+        if (!name || !email || !mobile || !internship_id || !instructor_id || !trainee_program_id || !college || !branch || !year) {
+            return res.status(400).json({ error: 'All fields are required' });
         }
-        // Insert trainee
+        // Insert into trainees table (add columns if needed)
         const [result, meta] = await sequelize.query(
-            "INSERT INTO trainees (name, email, mobileNo) VALUES (?, ?, ?)",
-            { replacements: [name, email, mobile], type: QueryTypes.INSERT }
+            'INSERT INTO trainees (name, email, mobileNo, college, branch, year, photo) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            { replacements: [name, email, mobile, college, branch, year, photoPath], type: QueryTypes.INSERT }
         );
-        const trainee_id = meta && meta.insertId ? meta.insertId : (Array.isArray(result) ? result[0] : result);
-        // Update internship_transaction to set trainee_id for this trainee program
-        const [updateResult] = await sequelize.query(
-            "UPDATE internship_transaction SET trainee_id = ? WHERE internship_id = ? AND instructor_id = ? AND trainee_prog_id = ?",
-            { replacements: [trainee_id, internship_id, instructor_id, trainee_program_id], type: QueryTypes.UPDATE }
+        // Get the new trainee's id
+        const traineeId = meta && meta.insertId ? meta.insertId : (Array.isArray(result) ? result[0] : result);
+        // Map trainee to trainee_program_id in internship_transaction
+        await sequelize.query(
+            'INSERT INTO internship_transaction (internship_id, instructor_id, trainee_prog_id, trainee_id) VALUES (?, ?, ?, ?)',
+            { replacements: [internship_id, instructor_id, trainee_program_id, traineeId], type: QueryTypes.INSERT }
         );
-        console.log('Updated internship_transaction for trainee:', updateResult);
-        res.json({ success: true, message: "Trainee added and mapped successfully" });
+        res.json({ success: true, message: 'Trainee added successfully' });
     } catch (err) {
-        console.error("Database error in addTrainee:", err);
-        res.status(500).json({ error: "Internal server error: " + err.message });
+        console.error('Database error in addTrainee:', err);
+        res.status(500).json({ error: 'Internal server error: ' + err.message });
     }
 };
 
