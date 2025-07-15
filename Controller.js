@@ -59,6 +59,9 @@ const insLogin = async (req, res) => {
             }
         );
         const internship_id = transaction ? transaction.internship_id : null;
+        if (!internship_id) {
+            return res.status(400).json({ error: "No internship program assigned to this instructor. Please contact admin." });
+        }
         // Return instructor data along with internship_id
         res.json({
             success: true, 

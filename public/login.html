@@ -237,6 +237,10 @@
                     if (result.success) {
                         alert('Login successful');
                         if (role === 'Instructor') {
+                            if (!result.instructor.internship_id || result.instructor.internship_id === 'null') {
+                                alert('No internship program assigned to your account. Please contact admin.');
+                                return;
+                            }
                             // Save the instructor's actual ID and internship_id from the response
                             localStorage.setItem('instructor_id', result.instructor.instructor_id);
                             localStorage.setItem('internship_id', result.instructor.internship_id);
