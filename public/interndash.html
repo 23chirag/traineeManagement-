@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Program Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #f2e3fc 0%, #cfd9df 50%, #e2e2e2 100%);
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            width: 90vw;
+            max-width: 1100px;
+            margin: 2rem auto;
+            background: rgba(255, 255, 255, 0.55);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18), 0 1.5px 4px rgba(0,0,0,0.04);
+            padding: 48px 36px 36px 36px;
+            backdrop-filter: blur(12px) saturate(160%);
+            -webkit-backdrop-filter: blur(12px) saturate(160%);
+            border: 1.5px solid rgba(255,255,255,0.25);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow: auto;
+        }
+        .section {
+            margin-bottom: 2.5rem;
+        }
+        .card-header {
+            background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+            color: #fff;
+            border-radius: 14px 14px 0 0;
+            padding: 2rem 1.5rem 1.2rem 1.5rem;
+            box-shadow: 0 2px 8px rgba(31, 38, 135, 0.08);
+        }
+        .card-header h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .card-header p {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 400;
+            opacity: 0.95;
+        }
+        .trainee-table-section {
+            background: none;
+            border-radius: 12px;
+            box-shadow: none;
+            padding: 0;
+        }
+        .trainee-table-section table {
+            border: none;
+        }
+        .trainee-table-section th, .trainee-table-section td {
+            border: none;
+        }
+        .table-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            gap: 16px;
+        }
+        .add-btn {
+            background: linear-gradient(90deg, #7f9cf5 0%, #b8c6ff 100%);
+            color: #fff;
+            font-size: 1.08rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 22px;
+            box-shadow: 0 2px 8px rgba(127,156,245,0.10);
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+        }
+        .add-btn:hover {
+            background: linear-gradient(90deg, #5a7cff 0%, #a0b6ff 100%);
+            box-shadow: 0 4px 16px rgba(127,156,245,0.16);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .view-btn {
+            background: linear-gradient(90deg, #7f9cf5 0%, #b8c6ff 100%);
+            color: #fff;
+            font-size: 0.98rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            padding: 7px 16px;
+            box-shadow: 0 2px 8px rgba(127,156,245,0.10);
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+            min-width: 70px;
+            text-align: center;
+        }
+        .view-btn:hover {
+            background: linear-gradient(90deg, #5a7cff 0%, #a0b6ff 100%);
+            box-shadow: 0 4px 16px rgba(127,156,245,0.16);
+            transform: translateY(-2px) scale(1.03);
+        }
+        h2 {
+            color: #2d3a4a;
+            margin-top: 0;
+            margin-bottom: 22px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: rgba(255,255,255,0.85);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(160,180,255,0.10);
+            transition: box-shadow 0.2s;
+        }
+        th, td {
+            padding: 16px 20px;
+            text-align: left;
+        }
+        th {
+            background: rgba(240,244,250,0.95);
+            color: #3a4a5d;
+            font-weight: 700;
+            border-bottom: 2px solid #e3e8ee;
+            letter-spacing: 0.5px;
+        }
+        td {
+            color: #4a5a6a;
+            border-bottom: 1px solid #f0f4fa;
+            font-size: 1.07rem;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr {
+            transition: background 0.22s, transform 0.18s, box-shadow 0.18s;
+        }
+        tbody tr:hover {
+            background: linear-gradient(90deg, #e0e7ff 0%, #fbc2eb 100%);
+            cursor: pointer;
+            transform: scale(1.012);
+            box-shadow: 0 4px 16px rgba(160,180,255,0.13);
+        }
+        .project-tasks-section {
+            background: #f9fbfd;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(31, 38, 135, 0.05);
+            padding: 1.5rem 1rem;
+        }
+        .task-item {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e3e8ee;
+        }
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        .task-title {
+            font-size: 1.05rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .task-status {
+            min-width: 180px;
+        }
+        select {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1.5px solid #b2c7e6;
+            background: rgba(245, 250, 255, 0.85);
+            font-size: 1.08rem;
+            transition: border 0.2s, box-shadow 0.2s;
+            box-shadow: 0 1px 4px rgba(160,180,255,0.08);
+        }
+        select:focus {
+            border: 2px solid #7f9cf5;
+            outline: none;
+            box-shadow: 0 0 0 2px #b2c7e6;
+        }
+        .trainee-table-section th {
+            background: rgba(240,244,250,0.95);
+            color: #3a4a5d;
+            font-weight: 700;
+            border-bottom: 2px solid #e3e8ee;
+            letter-spacing: 0.5px;
+        }
+        .trainee-table-section, .project-table-section {
+            background: rgba(255,255,255,0.85);
+            border-radius: 18px;
+            box-shadow: 0 2px 12px rgba(160,180,255,0.10);
+            padding: 1.5rem 1rem 1.5rem 1rem;
+            margin-bottom: 2.5rem;
+        }
+        @media (max-width: 700px) {
+            .container {
+                padding: 0.7rem;
+            }
+            .card-header {
+                padding: 1.2rem 0.7rem 0.8rem 0.7rem;
+            }
+            th, td {
+                padding: 10px 6px;
+                font-size: 0.98rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .trainee-table-section, .project-tasks-section {
+                padding: 1rem 0.5rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .container {
+                margin: 0.5rem;
+                padding: 0.2rem;
+            }
+            .card-header h1 {
+                font-size: 1.2rem;
+            }
+            th, td {
+                padding: 0.5rem 0.2rem;
+                font-size: 0.95rem;
+            }
+            .task-title {
+                font-size: 0.98rem;
+            }
+            .task-status {
+                min-width: 120px;
+            }
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(44, 62, 80, 0.25);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: rgba(255,255,255,0.95);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+            padding: 32px 28px 24px 28px;
+            min-width: 320px;
+            max-width: 95vw;
+            width: 400px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            animation: modalFadeIn 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        @keyframes modalFadeIn {
+            from { transform: translateY(40px) scale(0.98); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .close-modal {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+        .close-modal:hover {
+            color: #e74c3c;
+        }
+        .modal-content h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.3rem;
+            color: #2d3a4a;
+            text-align: center;
+        }
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .modal-form label {
+            font-size: 1rem;
+            color: #3a4a5d;
+            font-weight: 500;
+        }
+        .modal-form input, .modal-form textarea {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #cfd8dc;
+            font-size: 1rem;
+            background: #f7fafc;
+            margin-bottom: 4px;
+        }
+        .modal-form input:focus, .modal-form textarea:focus {
+            border: 1.5px solid #7f9cf5;
+            outline: none;
+        }
+        .modal-form textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+        .submit-btn {
+            background: linear-gradient(90deg, #7f9cf5 0%, #b8c6ff 100%);
+            color: #fff;
+            font-size: 1.08rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 0;
+            margin-top: 8px;
+            box-shadow: 0 2px 8px rgba(127,156,245,0.10);
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+        }
+        .submit-btn:hover {
+            background: linear-gradient(90deg, #5a7cff 0%, #a0b6ff 100%);
+            box-shadow: 0 4px 16px rgba(127,156,245,0.16);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .fade-out {
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="position: relative;">
+        <button id="backToDashboardBtn" style="position: absolute; top: 18px; left: 18px; background: #e7eefe; color: #2575fc; font-size: 1rem; font-weight: 500; border: none; border-radius: 6px; padding: 6px 16px; box-shadow: 0 1px 4px rgba(127,156,245,0.07); cursor: pointer; transition: background 0.18s, color 0.18s; min-width: unset;">← Back</button>
+        <!-- Internship Description Section -->
+        <div class="section card-header">
+            <h1>Summer Internship Program 2024</h1>
+            <p>
+                Join our immersive internship program designed to provide hands-on experience in software development, teamwork, and project management. Trainees will work on real-world projects, collaborate with mentors, and develop essential skills for their future careers.
+            </p>
+        </div>
+
+        <!-- Trainee Table Section -->
+        <div class="section trainee-table-section">
+            <div class="table-header-row">
+                <h2>Trainee List</h2>
+                <button class="add-btn">+ Add Trainee</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Trainee ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Mobile Number</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="4" style="text-align:center; color:#aaa;">No trainees added yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Project Table Section -->
+        <div class="section project-table-section">
+            <div class="table-header-row">
+                <h2>Project List</h2>
+                <button class="add-btn">+ Add Project</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Project ID</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>View</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="6" style="text-align:center; color:#aaa;">No projects added yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="addTraineeModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal" id="closeAddTraineeModalBtn">&times;</button>
+            <h3>Add Trainee</h3>
+            <form class="modal-form" id="addTraineeForm">
+                <label for="traineeName">Name</label>
+                <input type="text" id="traineeName" name="traineeName" required />
+                <label for="traineeEmail">Email</label>
+                <input type="email" id="traineeEmail" name="traineeEmail" required />
+                <label for="traineeMobile">Mobile Number</label>
+                <input type="text" id="traineeMobile" name="traineeMobile" required />
+                <button type="submit" class="submit-btn">Add Trainee</button>
+            </form>
+        </div>
+    </div>
+    <div id="addProjectModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal" id="closeAddProjectModalBtn">&times;</button>
+            <h3>Add Project</h3>
+            <form class="modal-form" id="addProjectForm">
+                <label for="projectTitle">Title</label>
+                <input type="text" id="projectTitle" name="projectTitle" required />
+                <label for="projectDescription">Description</label>
+                <textarea id="projectDescription" name="projectDescription" placeholder="Enter project description..." required></textarea>
+                <label for="projectStart">Start Date</label>
+                <input type="date" id="projectStart" name="projectStart" required />
+                <label for="projectEnd">End Date</label>
+                <input type="date" id="projectEnd" name="projectEnd" required />
+                <button type="submit" class="submit-btn">Add Project</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        // Check for required IDs in localStorage at the very top
+        const internship_id = localStorage.getItem('internship_id');
+        const instructor_id = localStorage.getItem('instructor_id');
+        const trainee_program_id = localStorage.getItem('trainee_program_id');
+        if (!internship_id || !instructor_id || !trainee_program_id) {
+            alert('Session expired or not logged in. Please log in again.');
+            window.location.href = 'login.html';
+        }
+        // Add interactivity for task status dropdowns (optional: visual feedback)
+        document.querySelectorAll('.task-status select').forEach(function(select) {
+            select.addEventListener('change', function() {
+                select.style.background = '#eaf1fb';
+                setTimeout(() => {
+                    select.style.background = '#fff';
+                }, 400);
+            });
+        });
+
+        // Modal logic for Add Trainee
+        const addTraineeBtn = document.querySelector('.trainee-table-section .add-btn');
+        const addTraineeModal = document.getElementById('addTraineeModal');
+        const closeAddTraineeModalBtn = document.getElementById('closeAddTraineeModalBtn');
+        addTraineeBtn.addEventListener('click', () => {
+            const tbody = document.querySelector('.trainee-table-section tbody');
+            // Check if there is at least one trainee row (not the placeholder row)
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const hasTrainee = rows.some(row => row.children.length === 4 && !row.textContent.includes('No trainees added yet.') && !row.textContent.includes('Loading...'));
+            if (hasTrainee) {
+                alert("You can't add more than one trainee in an internship program");
+                return;
+            }
+            addTraineeModal.classList.add('active');
+        });
+        closeAddTraineeModalBtn.addEventListener('click', () => {
+            addTraineeModal.classList.remove('active');
+        });
+        window.addEventListener('click', (e) => {
+            if (e.target === addTraineeModal) {
+                addTraineeModal.classList.remove('active');
+            }
+        });
+
+        // Modal logic for Add Project
+        const addProjectBtn = document.querySelector('.project-table-section .add-btn');
+        const addProjectModal = document.getElementById('addProjectModal');
+        const closeAddProjectModalBtn = document.getElementById('closeAddProjectModalBtn');
+        addProjectBtn.addEventListener('click', () => {
+            addProjectModal.classList.add('active');
+        });
+        closeAddProjectModalBtn.addEventListener('click', () => {
+            addProjectModal.classList.remove('active');
+        });
+        window.addEventListener('click', (e) => {
+            if (e.target === addProjectModal) {
+                addProjectModal.classList.remove('active');
+            }
+        });
+
+        // Handle Add Trainee form submission
+        const addTraineeForm = document.getElementById('addTraineeForm');
+        addTraineeForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('traineeName').value;
+            const email = document.getElementById('traineeEmail').value;
+            const mobile = document.getElementById('traineeMobile').value;
+            const internship_id = localStorage.getItem('internship_id');
+            const instructor_id = localStorage.getItem('instructor_id');
+            const trainee_program_id = localStorage.getItem('trainee_program_id');
+            try {
+                const res = await fetch('http://localhost:8000/instructor/addTrainee', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, mobile, internship_id, instructor_id, trainee_program_id })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert('Trainee added successfully!');
+                    addTraineeForm.reset();
+                    addTraineeModal.classList.remove('active');
+                    fetchAndRenderDashboardData();
+                } else {
+                    alert(result.error || 'Failed to add trainee');
+                }
+            } catch (err) {
+                alert('Error adding trainee.');
+            }
+        });
+
+        // Handle Add Project form submission
+        const addProjectForm = document.getElementById('addProjectForm');
+        addProjectForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const title = document.getElementById('projectTitle').value;
+            const description = document.getElementById('projectDescription').value;
+            const start_date = document.getElementById('projectStart').value;
+            const end_date = document.getElementById('projectEnd').value;
+            const tr_id = localStorage.getItem('trainee_program_id');
+            try {
+                const res = await fetch('http://localhost:8000/instructor/addProject', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description, start_date, end_date, tr_id })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert('Project added successfully!');
+                    addProjectForm.reset();
+                    addProjectModal.classList.remove('active');
+                    fetchAndRenderDashboardData();
+                } else {
+                    alert(result.error || 'Failed to add project');
+                }
+            } catch (err) {
+                alert('Error adding project.');
+            }
+        });
+
+        // Fetch and render dashboard data (mapped trainee and project)
+        async function fetchAndRenderDashboardData() {
+            const internship_id = localStorage.getItem('internship_id');
+            const instructor_id = localStorage.getItem('instructor_id');
+            const trainee_program_id = localStorage.getItem('trainee_program_id');
+
+            if (!internship_id || !instructor_id || !trainee_program_id) {
+                alert('Session expired or not logged in. Please log in again.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const traineeTbody = document.querySelector('.trainee-table-section tbody');
+            const projectTbody = document.querySelector('.project-table-section tbody');
+            traineeTbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#aaa;">Loading...</td></tr>';
+            projectTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#aaa;">Loading...</td></tr>';
+            try {
+                // Fetch unique trainees for this trainee program
+                const resTrainees = await fetch(`http://localhost:8000/instructor/uniqueTraineesForProgram?trainee_program_id=${encodeURIComponent(trainee_program_id)}`);
+                const trainees = await resTrainees.json();
+                if (trainees.length > 0) {
+                    traineeTbody.innerHTML = trainees.map(t => `
+                        <tr>
+                            <td>${t.id || ''}</td>
+                            <td>${t.name || ''}</td>
+                            <td>${t.email || ''}</td>
+                            <td>${t.mobileNo || t.mobile || ''}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    traineeTbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#aaa;">No trainees added yet.</td></tr>';
+                }
+
+                // Fetch all projects for this trainee program
+                const resProjects = await fetch(`http://localhost:8000/instructor/projectsForTraineeProgram?trainee_program_id=${encodeURIComponent(trainee_program_id)}`);
+                const projects = await resProjects.json();
+                if (projects.length > 0) {
+                    projectTbody.innerHTML = projects.map(p => `
+                        <tr>
+                            <td>${p.id || ''}</td>
+                            <td>${p.title || ''}</td>
+                            <td>${p.description || ''}</td>
+                            <td>${p.startDate ? p.startDate.split('T')[0] : ''}</td>
+                            <td>${p.endDate ? p.endDate.split('T')[0] : ''}</td>
+                            <td><button class="view-btn" onclick="viewProject('${p.id}', this, '${p.tr_id}')">View</button></td>
+                            <td class="status-cell"></td>
+                        </tr>
+                    `).join('');
+                    // Update project status cells after rendering
+                    document.querySelectorAll('.project-table-section tbody tr').forEach(row => {
+                        const projectIdRaw = row.children[0]?.textContent;
+                        const projectId = parseInt(projectIdRaw, 10);
+                        const statusCell = row.querySelector('.status-cell');
+                        if (statusCell) {
+                            statusCell.textContent = 'Not Submitted';
+                            statusCell.style.color = 'red';
+                        }
+                        if (projectId && !isNaN(projectId) && statusCell) {
+                            fetch(`http://localhost:8000/instructor/projectFileStatus?project_id=${projectId}`)
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.exists === true) {
+                                        statusCell.textContent = 'Submitted';
+                                        statusCell.style.color = 'green';
+                                    }
+                                });
+                        }
+                    });
+                } else {
+                    projectTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#aaa;">No projects added yet.</td></tr>';
+                }
+            } catch (err) {
+                traineeTbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#e74c3c;">Failed to load trainees.</td></tr>';
+                projectTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#e74c3c;">Failed to load projects.</td></tr>';
+            }
+        }
+
+        // Call fetch function on page load
+        fetchAndRenderDashboardData();
+
+        document.getElementById('backToDashboardBtn').onclick = function() {
+            const container = document.querySelector('.container');
+            container.classList.add('fade-out');
+            setTimeout(function() {
+                window.location.href = 'instructor.html';
+            }, 250);
+        };
+
+        // Internship Program Table Search
+        const internshipProgramSearch = document.getElementById('internshipProgramSearch');
+        internshipProgramSearch.addEventListener('input', function() {
+            const filter = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.trainee-table-section tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+    </script>
+    <script>
+    function viewProject(projectId, btn, traineeProgramId) {
+        // Store projectId in localStorage for later use
+        localStorage.setItem('project_id', projectId);
+        if (traineeProgramId) {
+            localStorage.setItem('trainee_program_id', traineeProgramId);
+        }
+        // Animate fade-out on the container like the back button
+        const container = document.querySelector('.container');
+        container.classList.add('fade-out');
+        setTimeout(function() {
+            window.location.href = `project_dashboard.html?projectId=${encodeURIComponent(projectId)}`;
+        }, 250);
+    }
+    </script>
+</body>
+</html> 

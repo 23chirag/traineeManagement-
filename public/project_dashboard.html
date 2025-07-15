@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #f2e3fc 0%, #cfd9df 50%, #e2e2e2 100%);
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            width: 90vw;
+            max-width: 1200px;
+            margin: 2rem auto;
+            background: rgba(255, 255, 255, 0.55);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18), 0 1.5px 4px rgba(0,0,0,0.04);
+            padding: 48px 36px 36px 36px;
+            backdrop-filter: blur(12px) saturate(160%);
+            -webkit-backdrop-filter: blur(12px) saturate(160%);
+            border: 1.5px solid rgba(255,255,255,0.25);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow: auto;
+        }
+        .section {
+            margin-bottom: 2.5rem;
+        }
+        .project-overview {
+            background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+            color: #fff;
+            border-radius: 14px 14px 0 0;
+            padding: 2rem 1.5rem 1.2rem 1.5rem;
+            box-shadow: 0 2px 8px rgba(31, 38, 135, 0.08);
+        }
+        .project-overview h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .project-overview p {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 400;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+        .table-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            gap: 16px;
+        }
+        .add-btn {
+            background: linear-gradient(90deg, #7f9cf5 0%, #b8c6ff 100%);
+            color: #fff;
+            font-size: 1.08rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 22px;
+            box-shadow: 0 2px 8px rgba(127,156,245,0.10);
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+        }
+        .add-btn:hover {
+            background: linear-gradient(90deg, #5a7cff 0%, #a0b6ff 100%);
+            box-shadow: 0 4px 16px rgba(127,156,245,0.16);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .view-btn {
+            background: linear-gradient(90deg, #7f9cf5 0%, #b8c6ff 100%);
+            color: #fff;
+            font-size: 0.98rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            padding: 7px 16px;
+            box-shadow: 0 2px 8px rgba(127,156,245,0.10);
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+            min-width: 70px;
+            text-align: center;
+        }
+        .view-btn:hover {
+            background: linear-gradient(90deg, #5a7cff 0%, #a0b6ff 100%);
+            box-shadow: 0 4px 16px rgba(127,156,245,0.16);
+            transform: translateY(-2px) scale(1.03);
+        }
+        h2 {
+            color: #2d3a4a;
+            margin-top: 0;
+            margin-bottom: 22px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        .task-table-section {
+            background: rgba(255,255,255,0.85);
+            border-radius: 18px;
+            box-shadow: 0 2px 12px rgba(160,180,255,0.10);
+            padding: 1.5rem 1rem 1.5rem 1rem;
+            margin-bottom: 2.5rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: rgba(255,255,255,0.85);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(160,180,255,0.10);
+            transition: box-shadow 0.2s;
+        }
+        th, td {
+            padding: 16px 20px;
+            text-align: left;
+        }
+        th {
+            background: rgba(240,244,250,0.95);
+            color: #3a4a5d;
+            font-weight: 700;
+            border-bottom: 2px solid #e3e8ee;
+            letter-spacing: 0.5px;
+        }
+        td {
+            color: #4a5a6a;
+            border-bottom: 1px solid #f0f4fa;
+            font-size: 1.07rem;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr {
+            transition: background 0.22s, transform 0.18s, box-shadow 0.18s;
+        }
+        tbody tr:hover {
+            background: linear-gradient(90deg, #e0e7ff 0%, #fbc2eb 100%);
+            transform: scale(1.012);
+            box-shadow: 0 4px 16px rgba(160,180,255,0.13);
+        }
+        .status-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .status-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .status-btn.assigned {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #bbdefb;
+        }
+        .status-btn.assigned:hover {
+            background: #bbdefb;
+            transform: translateY(-1px);
+        }
+        .status-btn.completed {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        .status-btn.completed:hover {
+            background: #c8e6c9;
+            transform: translateY(-1px);
+        }
+        .status-btn.partial {
+            background: #fff3e0;
+            color: #f57c00;
+            border: 1px solid #ffcc02;
+        }
+        .status-btn.partial:hover {
+            background: #ffcc02;
+            transform: translateY(-1px);
+        }
+        .status-btn.reassigned {
+            background: #f3e5f5;
+            color: #7b1fa2;
+            border: 1px solid #ce93d8;
+        }
+        .status-btn.reassigned:hover {
+            background: #ce93d8;
+            transform: translateY(-1px);
+        }
+        .status-btn.not-completed {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        .status-btn.not-completed:hover {
+            background: #ef9a9a;
+            transform: translateY(-1px);
+        }
+
+        .status-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #ccc !important;
+            color: #666 !important;
+        }
+
+        .status-btn:disabled:hover {
+            transform: none;
+            background-color: #ccc !important;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-badge.assigned {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        .status-badge.completed {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        .status-badge.partial {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        .status-badge.reassigned {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+        .status-badge.not-completed {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(44, 62, 80, 0.25);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: rgba(255,255,255,0.95);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+            padding: 32px 28px 24px 28px;
+            min-width: 320px;
+            max-width: 95vw;
+            width: 400px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            animation: modalFadeIn 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        @keyframes modalFadeIn {
+            from { transform: translateY(40px) scale(0.98); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .close-modal {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+        .close-modal:hover {
+            color: #e74c3c;
+        }
+        .modal-content h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.3rem;
+            color: #2d3a4a;
+            text-align: center;
+        }
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .modal-form label {
+            font-size: 1rem;
+            color: #3a4a5d;
+            font-weight: 500;
+        }
+        .modal-form input, .modal-form select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #cfd8dc;
+            font-size: 1rem;
+            background: #f7fafc;
+            margin-bottom: 4px;
+        }
+        .modal-form input:focus, .modal-form select:focus {
+            border: 1.5px solid #7f9cf5;
+            outline: none;
+        }
+        .submit-btn {
+            background: linear-gradient(90deg, #7f9cf5 0%, #b8c6ff 100%);
+            color: #fff;
+            font-size: 1.08rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 0;
+            margin-top: 8px;
+            box-shadow: 0 2px 8px rgba(127,156,245,0.10);
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+        }
+        .submit-btn:hover {
+            background: linear-gradient(90deg, #5a7cff 0%, #a0b6ff 100%);
+            box-shadow: 0 4px 16px rgba(127,156,245,0.16);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .fade-out {
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .reassign-modal-content {
+            background: rgba(255,255,255,0.95);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+            padding: 32px 28px 24px 28px;
+            min-width: 320px;
+            max-width: 95vw;
+            width: 400px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            animation: modalFadeIn 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        .turn-in-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: -1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .turn-in-btn {
+            background: linear-gradient(90deg, #7f9cf5 0%, #b8c6ff 100%);
+            color: #fff;
+            font-size: 1.08rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 32px;
+            box-shadow: 0 2px 8px rgba(127,156,245,0.10);
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s, opacity 0.18s;
+            opacity: 1;
+        }
+        .turn-in-btn:disabled {
+            background: #bfc9db;
+            color: #fff;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+        }
+        @media (max-width: 700px) {
+            .container {
+                padding: 0.7rem;
+            }
+            .project-overview {
+                padding: 1.2rem 0.7rem 0.8rem 0.7rem;
+            }
+            th, td {
+                padding: 10px 6px;
+                font-size: 0.98rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .task-table-section {
+                padding: 1rem 0.5rem;
+            }
+            .status-buttons {
+                flex-direction: column;
+                gap: 4px;
+            }
+            .status-btn {
+                font-size: 0.8rem;
+                padding: 4px 8px;
+            }
+        }
+        @media (max-width: 480px) {
+            .container {
+                margin: 0.5rem;
+                padding: 0.2rem;
+            }
+            .project-overview h1 {
+                font-size: 1.2rem;
+            }
+            th, td {
+                padding: 0.5rem 0.2rem;
+                font-size: 0.95rem;
+            }
+            .status-buttons {
+                gap: 2px;
+            }
+            .status-btn {
+                font-size: 0.75rem;
+                padding: 3px 6px;
+            }
+        }
+        /* Modal overlay and content already styled above */
+        #turnInModal .modal-content {
+            min-width: 320px;
+            max-width: 95vw;
+            width: 400px;
+        }
+        #turnInModal label {
+            font-weight: 500;
+            margin-top: 8px;
+        }
+        #turnInModal input[type="file"] {
+            background: #f7fafc;
+            border: 1px solid #cfd8dc;
+            border-radius: 6px;
+            padding: 8px 0;
+            margin-bottom: 8px;
+        }
+        /* In the Add Task modal, increase modal-content width and textarea size */
+        #addTaskModal .modal-content {
+            min-width: 420px;
+            max-width: 540px;
+            width: 100%;
+        }
+        #addTaskForm textarea#description {
+            min-height: 100px;
+            width: 100%;
+            resize: vertical;
+            font-size: 1.08rem;
+            padding: 10px 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="position: relative;">
+        <button id="backToDashboardBtn" style="position: absolute; top: 18px; left: 18px; background: #e7eefe; color: #2575fc; font-size: 1rem; font-weight: 500; border: none; border-radius: 6px; padding: 6px 16px; box-shadow: 0 1px 4px rgba(127,156,245,0.07); cursor: pointer; transition: background 0.18s, color 0.18s; min-width: unset;">← Back</button>
+        <!-- Project Overview Section -->
+        <div class="section project-overview" style="display: flex; flex-direction: row; gap: 32px; align-items: stretch;">
+            <div style="flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center;">
+                <div class="project-details-card" style="width: 100%; max-width: 500px; min-width: 220px; max-height: 260px; overflow-y: auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #0001; padding: 32px 36px; display: flex; flex-direction: column;">
+                    <h1 id="projectName" style="margin-top:0; margin-bottom:18px; color:#2575fc; font-size:2rem;">E-Commerce Platform Development</h1>
+                    <p id="projectDescription" style="color:#222; font-size:1.15rem; margin:0;">
+                        A comprehensive e-commerce platform with user authentication, product catalog, shopping cart functionality, payment integration, and admin dashboard. The project aims to create a modern, responsive web application that provides seamless shopping experience for customers and efficient management tools for administrators.
+                    </p>
+                </div>
+            </div>
+            <div style="flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center;">
+                <div class="trainee-details-card" style="width: 100%; max-width: 400px; min-width: 220px; max-height: 260px; overflow-y: auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #0001; padding: 24px 28px; display: flex; flex-direction: column;">
+                    <h2 style="margin-top:0; margin-bottom:18px; color:#2575fc; font-size:1.25rem;">Trainee Details</h2>
+                    <div id="traineeDetailsForm">
+                        <!-- Trainee details will be loaded here -->
+                        <div style="text-align:center; color:#aaa;">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Management Section -->
+        <div class="section task-table-section">
+            <div class="table-header-row">
+                <h2>Project Tasks</h2>
+                <button class="add-btn" id="addTaskBtn">+ Add Task</button>
+            </div>
+            <table id="taskTable">
+                <thead>
+                    <tr>
+                        <th>S.No.</th>
+                        <th>Task Title</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Current Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="taskTableBody">
+                    <!-- Tasks will be loaded dynamically from database -->
+                </tbody>
+            </table>
+        </div>
+        <!-- Turn In Button Section -->
+        <div class="section turn-in-section">
+            <button id="turnInBtn" class="turn-in-btn" disabled>Turn In</button>
+        </div>
+        <!-- Turn In Modal -->
+        <div id="turnInModal" class="modal-overlay">
+            <div class="modal-content" style="max-width:480px;">
+                <button class="close-modal" id="closeTurnInModalBtn">&times;</button>
+                <h3>Submit Final Documents</h3>
+                <form id="turnInForm" method="POST" enctype="multipart/form-data" class="modal-form">
+                    <label for="reportFile">Final Project Report (PDF or DOCX)</label>
+                    <input type="file" id="reportFile" name="reportFile" accept=".pdf,.docx" required />
+                    <button type="submit" class="submit-btn">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div id="addTaskModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal" id="closeAddTaskModalBtn">&times;</button>
+            <h3>Add New Task</h3>
+            <form class="modal-form" id="addTaskForm">
+                <label for="taskTitle">Task Title</label>
+                <input type="text" id="taskTitle" name="taskTitle" required />
+                <label for="description">Task Description</label>
+                <textarea id="description" name="description" placeholder="Enter task description..." required></textarea>
+                <label for="startDate">Start Date</label>
+                <input type="date" id="startDate" name="startDate" required />
+                <label for="endDate">End Date</label>
+                <input type="date" id="endDate" name="endDate" required />
+                <button type="submit" class="submit-btn">Add Task</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Change Task Date Modal -->
+    <div id="reassignTaskModal" class="modal-overlay">
+        <div class="reassign-modal-content">
+            <button class="close-modal" id="closeReassignTaskModalBtn">&times;</button>
+            <h3>Change Task End Date</h3>
+            <form class="modal-form" id="reassignTaskForm">
+                <label for="newEndDate">New End Date</label>
+                <input type="date" id="newEndDate" name="newEndDate" required />
+                
+                <button type="submit" class="submit-btn">Update End Date</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let taskCounter = 1; // Will be updated based on database tasks
+
+        // Modal functionality for Add Task
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const addTaskModal = document.getElementById('addTaskModal');
+        const closeAddTaskModalBtn = document.getElementById('closeAddTaskModalBtn');
+        const addTaskForm = document.getElementById('addTaskForm');
+
+        addTaskBtn.addEventListener('click', () => {
+            addTaskModal.classList.add('active');
+        });
+
+        closeAddTaskModalBtn.addEventListener('click', () => {
+            addTaskModal.classList.remove('active');
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === addTaskModal) {
+                addTaskModal.classList.remove('active');
+            }
+        });
+
+        // Modal functionality for Reassign Task
+        const reassignTaskModal = document.getElementById('reassignTaskModal');
+        const closeReassignTaskModalBtn = document.getElementById('closeReassignTaskModalBtn');
+        const reassignTaskForm = document.getElementById('reassignTaskForm');
+        let currentTaskId = null;
+
+        closeReassignTaskModalBtn.addEventListener('click', () => {
+            reassignTaskModal.classList.remove('active');
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === reassignTaskModal) {
+                reassignTaskModal.classList.remove('active');
+            }
+        });
+
+        // Handle form submission
+        addTaskForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            let taskTitle = document.getElementById('taskTitle').value;
+            let description = document.getElementById('description').value;
+            let startDate = document.getElementById('startDate').value;
+            let endDate = document.getElementById('endDate').value;
+            // Convert dates to yyyy-mm-dd if needed
+            function toISODate(dateStr) {
+                if (!dateStr) return '';
+                if (dateStr.includes('-')) return dateStr; // already yyyy-mm-dd
+                const [d, m, y] = dateStr.split(/[\/\-]/);
+                if (y && m && d) return `${y.padStart(4, '0')}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+                return dateStr;
+            }
+            startDate = toISODate(startDate);
+            endDate = toISODate(endDate);
+            // Get IDs from localStorage
+            const project_id = localStorage.getItem('project_id');
+            try {
+                const res = await fetch('http://localhost:8000/instructor/addTask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: taskTitle,
+                        description: description,
+                        startDate,
+                        endDate,
+                        project_id
+                    })
+                });
+                const result = await res.json();
+                console.log('Parsed result:', result);
+                if (result.success) {
+                    alert('Task added successfully!');
+                    addTaskForm.reset();
+                   addTaskModal.classList.remove('active');
+                    // Reload tasks from database after adding new task
+                    loadTasksFromDatabase();
+                } else {
+                    alert(result.error || 'Failed to add task');
+                }
+            } catch (err) {
+                console.error('Add task error:', err);
+                alert('Error adding task.');
+            }
+        });
+
+        // Handle reassign form submission
+        reassignTaskForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const newEndDate = document.getElementById('newEndDate').value;
+            
+            if (currentTaskId) {
+                updateTaskReassign(currentTaskId, newEndDate);
+            }
+            
+            // Reset form and close modal
+            reassignTaskForm.reset();
+            reassignTaskModal.classList.remove('active');
+            currentTaskId = null;
+        });
+
+        // Function to add new task
+        function addNewTask(title, startDate, endDate, status) {
+            const taskId = `T${taskCounter.toString().padStart(3, '0')}`;
+            const statusText = getStatusText(status);
+            
+            // Get current number of rows to determine serial number
+            const currentRows = document.getElementById('taskTableBody').getElementsByTagName('tr');
+            const serialNumber = currentRows.length + 1;
+            
+            // Check if buttons should be enabled for this end date
+            const buttonsEnabled = shouldEnableStatusButtons(endDate);
+            
+            const newRow = document.createElement('tr');
+            newRow.setAttribute('data-task-id', taskId);
+            newRow.innerHTML = `
+                <td>${serialNumber}</td>
+                <td>${title}</td>
+                <td>${startDate}</td>
+                <td>${endDate}</td>
+                <td><span class="status-badge ${status}">${statusText}</span></td>
+                <td>
+                    <div class="status-buttons">
+                                <button class="status-btn completed" onclick="updateTaskStatus(this, '${taskId}', 'completed')" ${!buttonsEnabled ? 'disabled' : ''}>Completed</button>
+                                <button class="status-btn partial" onclick="updateTaskStatus(this, '${taskId}', 'partial')" ${!buttonsEnabled ? 'disabled' : ''}>Partial</button>
+                                <button class="status-btn reassigned" onclick="updateTaskStatus(this, '${taskId}', 'reassigned')" ${!buttonsEnabled ? 'disabled' : ''}>Reassign</button>
+                                <button class="status-btn not-completed" onclick="updateTaskStatus(this, '${taskId}', 'not-completed')" ${!buttonsEnabled ? 'disabled' : ''}>Not Done</button>
+                    </div>
+                </td>
+            `;
+            
+            document.getElementById('taskTableBody').appendChild(newRow);
+            taskCounter++;
+        }
+
+        // Function to update task status
+        async function updateTaskStatus(button, taskId, newStatus) {
+            // Special handling for reassigned status - only change end date, keep status as assigned
+            if (newStatus === 'reassigned') {
+                currentTaskId = taskId;
+                reassignTaskModal.classList.add('active');
+                return;
+            }
+            
+            // Extract the actual task ID from the formatted taskId (e.g., "T001" -> "1")
+            const actualTaskId = taskId.replace('T', '');
+            
+            try {
+                const res = await fetch('http://localhost:8000/instructor/updateTaskStatus', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        task_id: actualTaskId,
+                        status: newStatus
+                    })
+                });
+                
+                const result = await res.json();
+                if (result.success) {
+            const row = button.closest('tr');
+                    const statusCell = row.querySelector('td:nth-child(5)');
+            const statusText = getStatusText(newStatus);
+            
+            // Update the status badge
+            statusCell.innerHTML = `<span class="status-badge ${newStatus}">${statusText}</span>`;
+            
+            // Visual feedback for the clicked button
+            button.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                button.style.transform = '';
+            }, 200);
+                    
+                    // Check turn in eligibility after status update
+                    checkTurnInEligibility();
+                } else {
+                    alert(result.error || 'Failed to update task status');
+                }
+            } catch (err) {
+                console.error('Error updating task status:', err);
+                alert('Error updating task status');
+            }
+        }
+
+        // Function to update task reassignment with new end date
+        async function updateTaskReassign(taskId, newEndDate) {
+            // Extract the actual task ID from the formatted taskId (e.g., "T001" -> "1")
+            const actualTaskId = taskId.replace('T', '');
+            
+            try {
+                const res = await fetch('http://localhost:8000/instructor/updateTaskStatus', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        task_id: actualTaskId,
+                        status: 'assigned', // Keep status as assigned
+                        new_end_date: newEndDate
+                    })
+                });
+                
+                const result = await res.json();
+                if (result.success) {
+                    // Reload tasks so button states update based on new end date
+                    loadTasksFromDatabase();
+                    checkTurnInEligibility();
+                } else {
+                    alert(result.error || 'Failed to update task reassignment');
+                }
+            } catch (err) {
+                console.error('Error updating task reassignment:', err);
+                alert('Error updating task reassignment');
+            }
+        }
+
+        // Helper function to get status text
+        function getStatusText(status) {
+            const statusMap = {
+                'assigned': 'Assigned',
+                'completed': 'Completed',
+                'partial': 'Partial',
+                'reassigned': 'Reassigned',
+                'not-completed': 'Not Done'
+            };
+            return statusMap[status] || status;
+        }
+
+        // Function to update project details (can be called from external scripts)
+        function updateProjectDetails(name, description) {
+            document.getElementById('projectName').textContent = name;
+            document.getElementById('projectDescription').textContent = description;
+        }
+
+        // Function to check if status buttons should be enabled
+        function shouldEnableStatusButtons(endDate) {
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+            return today === endDate;
+        }
+
+        // Function to check and auto-update overdue tasks
+        async function checkAndUpdateOverdueTasks() {
+            const project_id = localStorage.getItem('project_id');
+            if (!project_id) return;
+
+            try {
+                const res = await fetch(`http://localhost:8000/instructor/tasks?project_id=${encodeURIComponent(project_id)}`);
+                const tasks = await res.json();
+                
+                const today = new Date().toISOString().split('T')[0];
+                
+                for (const task of tasks) {
+                    const endDate = task.endDate ? task.endDate.split('T')[0] : '';
+                    const status = task.status || 'assigned';
+                    
+                    // If task is overdue and still assigned, auto-update to not-completed
+                    if (endDate && today > endDate && status === 'assigned') {
+                        await fetch('http://localhost:8000/instructor/updateTaskStatus', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                task_id: task.id,
+                                status: 'not-completed'
+                            })
+                        });
+                    }
+                }
+                
+                // Reload tasks to show updated statuses
+                loadTasksFromDatabase();
+            } catch (err) {
+                console.error('Error checking overdue tasks:', err);
+            }
+        }
+
+        // Function to load tasks from database
+        async function loadTasksFromDatabase() {
+            const project_id = localStorage.getItem('project_id');
+            if (!project_id) {
+                console.error('No project_id found in localStorage');
+                return;
+            }
+
+            const taskTableBody = document.getElementById('taskTableBody');
+            taskTableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#aaa;">Loading tasks...</td></tr>';
+
+            try {
+                const res = await fetch(`http://localhost:8000/instructor/tasks?project_id=${encodeURIComponent(project_id)}`);
+                const tasks = await res.json();
+                
+                if (tasks.length === 0) {
+                    taskTableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#aaa;">No tasks found for this project.</td></tr>';
+                    return;
+                }
+
+                taskTableBody.innerHTML = '';
+                tasks.forEach((task, index) => {
+                    const serialNumber = index + 1;
+                    const taskId = `T${task.id.toString().padStart(3, '0')}`;
+                    const status = task.status || 'assigned';
+                    const statusText = getStatusText(status);
+                    const endDate = task.endDate ? task.endDate.split('T')[0] : '';
+                    const buttonsEnabled = shouldEnableStatusButtons(endDate);
+                    
+                    const newRow = document.createElement('tr');
+                    newRow.setAttribute('data-task-id', taskId);
+                    newRow.innerHTML = `
+                        <td>${serialNumber}</td>
+                        <td>${task.taskTitle || ''}</td>
+                        <td>${task.startDate ? task.startDate.split('T')[0] : ''}</td>
+                        <td>${endDate}</td>
+                        <td><span class="status-badge ${status}">${statusText}</span></td>
+                        <td>
+                            <div class="status-buttons">
+                                <button class="status-btn completed" onclick="updateTaskStatus(this, '${taskId}', 'completed')" ${!buttonsEnabled ? 'disabled' : ''}>Completed</button>
+                                <button class="status-btn partial" onclick="updateTaskStatus(this, '${taskId}', 'partial')" ${!buttonsEnabled ? 'disabled' : ''}>Partial</button>
+                                <button class="status-btn reassigned" onclick="updateTaskStatus(this, '${taskId}', 'reassigned')" ${!buttonsEnabled ? 'disabled' : ''}>Reassign</button>
+                                <button class="status-btn not-completed" onclick="updateTaskStatus(this, '${taskId}', 'not-completed')" ${!buttonsEnabled ? 'disabled' : ''}>Not Done</button>
+                            </div>
+                        </td>
+                    `;
+                    
+                    taskTableBody.appendChild(newRow);
+                });
+
+                // Update task counter for new tasks
+                taskCounter = tasks.length + 1;
+                
+                // Check turn in eligibility after loading tasks
+                checkTurnInEligibility();
+            } catch (err) {
+                console.error('Error loading tasks:', err);
+                taskTableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#e74c3c;">Failed to load tasks.</td></tr>';
+            }
+        }
+//function to load trainee data
+async function loadTraineeData() {
+    const trainee_id = localStorage.getItem('trainee_id');
+    const detailsDiv = document.getElementById('traineeDetailsForm');
+    if (trainee_id) {
+        try {
+            const res = await fetch(`http://localhost:8000/instructor/traineeDetails?trainee_id=${encodeURIComponent(trainee_id)}`);
+            const trainee = await res.json();
+            if (trainee && !trainee.error) {
+                console.log('Rendering trainee:', trainee);
+                detailsDiv.innerHTML = `
+                    <div style="display:flex; flex-direction:column; gap:12px; color:#222;">
+                        <div><strong>ID:</strong> <span>${trainee.id || ''}</span></div>
+                        <div><strong>Name:</strong> <span>${trainee.name || ''}</span></div>
+                        <div><strong>Email:</strong> <span>${trainee.email || ''}</span></div>
+                        <div><strong>Mobile:</strong> <span>${trainee.mobileNo || trainee.mobile || ''}</span></div>
+                    </div>
+                `;
+            } else {
+                detailsDiv.innerHTML = '<div style="text-align:center; color:#aaa;">No trainee found for this ID.</div>';
+            }
+        } catch (err) {
+            detailsDiv.innerHTML = '<div style="text-align:center; color:#e74c3c;">Failed to load trainee details.</div>';
+            console.error('Error loading trainee details:', err);
+        }
+    } else {
+        detailsDiv.innerHTML = '<div style="text-align:center; color:#aaa;">No trainee selected.</div>';
+    }
+}
+        // Function to load project data
+        async function loadProjectData() {
+            const project_id = localStorage.getItem('project_id');
+            if (!project_id) {
+                window.projectEndDate = null;
+                return;
+            }
+            try {
+                const res = await fetch(`http://localhost:8000/instructor/projectDetails?project_id=${encodeURIComponent(project_id)}`);
+                const project = await res.json();
+                if (project && project.endDate) {
+                    window.projectEndDate = project.endDate.split('T')[0];
+                } else {
+                    window.projectEndDate = null;
+                }
+                // Set project description dynamically
+                if (project && project.description) {
+                    document.getElementById('projectDescription').textContent = project.description;
+                }
+                // Optionally set project name/title as well
+                if (project && project.title) {
+                    document.getElementById('projectName').textContent = project.title;
+                }
+            } catch (err) {
+                window.projectEndDate = null;
+            }
+        }
+
+        // --- Turn In Button Logic ---
+        const turnInBtn = document.getElementById('turnInBtn');
+        turnInBtn.disabled = false;
+        // Remove or disable checkTurnInEligibility and any calls to it
+        function checkTurnInEligibility() { turnInBtn.disabled = false; }
+
+        // Patch: Call checkTurnInEligibility after any status change
+        // Wrap the original updateTaskStatus
+        const originalUpdateTaskStatus = updateTaskStatus;
+        window.updateTaskStatus = function(button, taskId, newStatus) {
+            originalUpdateTaskStatus(button, taskId, newStatus);
+            turnInBtn.disabled = false;
+        };
+        // Patch: Call checkTurnInEligibility after reassign modal submit
+        const originalUpdateTaskReassign = updateTaskReassign;
+        window.updateTaskReassign = function(taskId, newEndDate) {
+            originalUpdateTaskReassign(taskId, newEndDate);
+            turnInBtn.disabled = false;
+        };
+        // Also check on page load and after adding a new task
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadProjectData();
+            await loadTraineeData();
+            checkAndUpdateOverdueTasks(); // This will also reload the tasks
+            turnInBtn.disabled = false;
+        });
+        // After adding a new task
+        const originalAddNewTask = addNewTask;
+        window.addNewTask = function(title, startDate, endDate, status) {
+            originalAddNewTask(title, startDate, endDate, status);
+            turnInBtn.disabled = false;
+        };
+
+        // Turn In button click
+        turnInBtn.addEventListener('click', function() {
+            const rows = document.querySelectorAll('#taskTableBody tr');
+            let hasTasks = false;
+            let anyAssigned = false;
+            for (let row of rows) {
+                const statusBadge = row.querySelector('td:nth-child(5) .status-badge');
+                if (statusBadge) {
+                    hasTasks = true;
+                    const statusClass = statusBadge.classList;
+                    if (statusClass.contains('assigned')) {
+                        anyAssigned = true;
+                    }
+                }
+            }
+            const projectEndDate = window.projectEndDate;
+            const todayStr = new Date().toISOString().split('T')[0];
+            const today = new Date(todayStr);
+            const endDate = projectEndDate ? new Date(projectEndDate) : null;
+            console.log('hasTasks:', hasTasks, 'anyAssigned:', anyAssigned, 'today:', todayStr, 'projectEndDate:', projectEndDate);
+            if (anyAssigned) {
+                console.log('Some task assigned: show alert and return');
+                alert('You cannot turn in while any task is still assigned.');
+                return;
+            }
+            if (!hasTasks) {
+                if (endDate && today < endDate) {
+                    console.log('No tasks, before end date: show confirm');
+                    if (confirm('Are you sure you want to turn in?')) {
+                turnInModal.classList.add('active');
+                    }
+                    return;
+                } else {
+                    console.log('No tasks, on/after end date: open modal');
+                    turnInModal.classList.add('active');
+                    return;
+                }
+            } else {
+                if (endDate && today < endDate) {
+                    console.log('Tasks, none assigned, before end date: show confirm');
+                    if (confirm('Are you sure you want to turn in?')) {
+                        turnInModal.classList.add('active');
+                    }
+                    return;
+                } else {
+                    console.log('Tasks, none assigned, on/after end date: open modal');
+                    turnInModal.classList.add('active');
+                    return;
+                }
+            }
+        });
+
+        // --- Turn In Modal Logic ---
+        const turnInModal = document.getElementById('turnInModal');
+        const closeTurnInModalBtn = document.getElementById('closeTurnInModalBtn');
+        const turnInForm = document.getElementById('turnInForm');
+
+        closeTurnInModalBtn.addEventListener('click', function() {
+            turnInModal.classList.remove('active');
+        });
+        window.addEventListener('click', function(e) {
+            if (e.target === turnInModal) {
+                turnInModal.classList.remove('active');
+            }
+        });
+        // Optional: Validate file types before submit
+        turnInForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (!confirm('Are you sure you want to submit?')) return;
+            const reportFile = document.getElementById('reportFile').files[0];
+            if (!reportFile) {
+                alert('Please select the final project report file.');
+                return;
+            }
+            const projIdRaw = localStorage.getItem('project_id');
+            const projId = parseInt(projIdRaw, 10);
+            if (!projId || isNaN(projId)) {
+                alert('No valid project selected. Please go back and try again.');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('reportFile', reportFile);
+            formData.append('proj_id', projId);
+            try {
+                const res = await fetch('http://localhost:8000/instructor/uploadReport', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert('File uploaded successfully!');
+                    turnInModal.classList.remove('active');
+                } else if (result.error === 'File already uploaded for this project') {
+                    alert('A file has already been uploaded for this project.');
+                } else {
+                    alert('Upload failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (err) {
+                alert('Upload failed: ' + err.message);
+            }
+        });
+    </script>
+    <script>
+    document.getElementById('backToDashboardBtn').onclick = function() {
+        const container = document.querySelector('.container');
+        container.classList.add('fade-out');
+        setTimeout(function() {
+            window.location.href = 'interndash.html';
+        }, 250);
+    };
+    </script>
+</body>
+</html> 

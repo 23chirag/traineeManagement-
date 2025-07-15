@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "dotenv": "^17.2.0",
+    "exceljs": "^4.4.0",
+    "multer": "^2.0.1",
+    "nodemailer": "^7.0.4"
+  }
+}

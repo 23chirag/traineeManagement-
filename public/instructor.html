@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructor Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #f2e3fc 0%, #cfd9df 50%, #e2e2e2 100%);
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            width: 80vw;
+            height: 65vh;
+            max-width: 1200px;
+            max-height: 700px;
+            margin: 0;
+            background: rgba(255, 255, 255, 0.55);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18), 0 1.5px 4px rgba(0,0,0,0.04);
+            padding: 48px 36px 36px 36px;
+            backdrop-filter: blur(12px) saturate(160%);
+            -webkit-backdrop-filter: blur(12px) saturate(160%);
+            border: 1.5px solid rgba(255,255,255,0.25);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow: auto;
+        }
+        h1 {
+            color: #2d3a4a;
+            margin-bottom: 22px;
+            font-size: 3.2rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 16px rgba(160,180,255,0.13);
+            line-height: 1.1;
+        }
+        .calendar-year {
+            margin-bottom: 36px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        label {
+            font-size: 1.13rem;
+            color: #3a4a5d;
+            font-weight: 500;
+        }
+        select {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1.5px solid #b2c7e6;
+            background: rgba(245, 250, 255, 0.85);
+            font-size: 1.08rem;
+            transition: border 0.2s, box-shadow 0.2s;
+            box-shadow: 0 1px 4px rgba(160,180,255,0.08);
+        }
+        select:focus {
+            border: 2px solid #7f9cf5;
+            outline: none;
+            box-shadow: 0 0 0 2px #b2c7e6;
+        }
+        h2 {
+            color: #2d3a4a;
+            margin-top: 0;
+            margin-bottom: 22px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: rgba(255,255,255,0.85);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(160,180,255,0.10);
+            transition: box-shadow 0.2s;
+        }
+        th, td {
+            padding: 16px 20px;
+            text-align: left;
+        }
+        th {
+            background: rgba(240,244,250,0.95);
+            color: #3a4a5d;
+            font-weight: 700;
+            border-bottom: 2px solid #e3e8ee;
+            letter-spacing: 0.5px;
+        }
+        td {
+            color: #4a5a6a;
+            border-bottom: 1px solid #f0f4fa;
+            font-size: 1.07rem;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr {
+            transition: background 0.22s, transform 0.18s, box-shadow 0.18s;
+        }
+        tbody tr:hover {
+            background: linear-gradient(90deg, #e0e7ff 0%, #fbc2eb 100%);
+            cursor: pointer;
+            transform: scale(1.012);
+            box-shadow: 0 4px 16px rgba(160,180,255,0.13);
+        }
+        @media (max-width: 600px) {
+            body {
+                align-items: flex-start;
+                justify-content: flex-start;
+            }
+            .container {
+                padding: 18px 4px;
+                margin: 24px 0 0 0;
+            }
+            th, td {
+                padding: 10px 6px;
+                font-size: 0.98rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+        }
+        @media (max-width: 900px), (max-height: 700px) {
+            .container {
+                width: 98vw;
+                height: auto;
+                max-width: 100vw;
+                max-height: none;
+                padding: 18px 4px;
+                margin: 24px 0 0 0;
+            }
+        }
+        .main-header {
+            width: 100vw;
+            background: rgba(255,255,255,0.35);
+            box-shadow: 0 2px 12px rgba(160,180,255,0.10);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            padding: 18px 0;
+        }
+        .header-content {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+        .centered-header {
+            padding-top: 18px;
+            padding-bottom: 0;
+        }
+        .title-header {
+            padding-bottom: 14px;
+            padding-top: 2px;
+        }
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #2d3a4a;
+            letter-spacing: 1px;
+            text-align: center;
+            display: inline-block;
+        }
+        .header-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #2d3a4a;
+            letter-spacing: 1px;
+            text-align: center;
+            width: 100%;
+            display: block;
+        }
+        .main-footer {
+            width: 100vw;
+            background: rgba(255,255,255,0.35);
+            box-shadow: 0 -2px 12px rgba(160,180,255,0.10);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+        }
+        .footer-content {
+            width: 100%;
+            max-width: 1100px;
+            text-align: center;
+            padding: 12px 32px 10px 32px;
+            color: #4a5a6a;
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        @media (max-width: 600px) {
+            .main-header, .main-footer {
+                padding-left: 0;
+                padding-right: 0;
+            }
+            .header-content, .footer-content {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+            .logo {
+                font-size: 1.05rem;
+            }
+        }
+        .header-content.center-header-flex {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 0 24px;
+            position: relative;
+        }
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #2d3a4a;
+            letter-spacing: 1px;
+            text-align: center;
+            display: inline-block;
+            margin: 0 auto;
+        }
+        #logoutBtn {
+            position: absolute;
+            right: 32px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .table-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            gap: 16px;
+        }
+        .add-program-btn {
+            background: linear-gradient(90deg, #7f9cf5 0%, #b8c6ff 100%);
+            color: #fff;
+            font-size: 1.08rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 22px;
+            box-shadow: 0 2px 8px rgba(127,156,245,0.10);
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+        }
+        .add-program-btn:hover {
+            background: linear-gradient(90deg, #5a7cff 0%, #a0b6ff 100%);
+            box-shadow: 0 4px 16px rgba(127,156,245,0.16);
+            transform: translateY(-2px) scale(1.03);
+        }
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(44, 62, 80, 0.25);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: rgba(255,255,255,0.95);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+            padding: 32px 28px 24px 28px;
+            min-width: 320px;
+            max-width: 95vw;
+            width: 400px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            animation: modalFadeIn 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        @keyframes modalFadeIn {
+            from { transform: translateY(40px) scale(0.98); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .close-modal {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+        .close-modal:hover {
+            color: #e74c3c;
+        }
+        .modal-content h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.3rem;
+            color: #2d3a4a;
+            text-align: center;
+        }
+        #addProgramForm {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #addProgramForm label {
+            font-size: 1rem;
+            color: #3a4a5d;
+            font-weight: 500;
+        }
+        #addProgramForm input, #addProgramForm select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #cfd8dc;
+            font-size: 1rem;
+            background: #f7fafc;
+            margin-bottom: 4px;
+        }
+        #addProgramForm input:focus, #addProgramForm select:focus {
+            border: 1.5px solid #7f9cf5;
+            outline: none;
+        }
+        #addProgramForm textarea {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #cfd8dc;
+            font-size: 1rem;
+            background: #f7fafc;
+            resize: vertical;
+            min-height: 80px;
+        }
+        #addProgramForm textarea:focus {
+            border: 1.5px solid #7f9cf5;
+            outline: none;
+        }
+        .submit-btn {
+            background: linear-gradient(90deg, #7f9cf5 0%, #b8c6ff 100%);
+            color: #fff;
+            font-size: 1.08rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 0;
+            margin-top: 8px;
+            box-shadow: 0 2px 8px rgba(127,156,245,0.10);
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+        }
+        .submit-btn:hover {
+            background: linear-gradient(90deg, #5a7cff 0%, #a0b6ff 100%);
+            box-shadow: 0 4px 16px rgba(127,156,245,0.16);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .instructors-modal-content {
+            max-width: 900px !important;
+            width: 95vw !important;
+        }
+        .modal-header-flex {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .modal-header-flex .table-header-row {
+            flex-direction: row;
+            align-items: center;
+            gap: 16px;
+        }
+        .modal-header-flex .close-modal {
+            margin-left: 16px;
+            margin-top: 2px;
+        }
+        .modal-content-relative {
+            position: relative;
+        }
+        .modal-close-absolute {
+            position: absolute;
+            top: 18px;
+            right: 24px;
+            z-index: 10;
+            margin: 0;
+        }
+        #programInstructorsModal .table-header-row {
+            margin-top: 36px !important;
+        }
+        #programInstructorsModal .modal-content table {
+            margin-top: 4px;
+        }
+        .add-instructor-modal-content {
+            max-width: 600px !important;
+            width: 95vw !important;
+        }
+        /* Unified View button style */
+        .view-btn {
+            background: linear-gradient(90deg, #7f9cf5 0%, #b8c6ff 100%);
+            color: #fff;
+            font-size: 0.98rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            padding: 7px 16px;
+            box-shadow: 0 2px 8px rgba(127,156,245,0.10);
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+            min-width: 70px;
+            text-align: center;
+        }
+        .view-btn:hover {
+            background: linear-gradient(90deg, #5a7cff 0%, #a0b6ff 100%);
+            box-shadow: 0 4px 16px rgba(127,156,245,0.16);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .close-btn {
+            background: #ffdddd;
+            color: #d32f2f;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 24px;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 2px 8px #0001;
+            cursor: pointer;
+            margin-left: 12px;
+        }
+        .view-btn {
+            margin-right: 0;
+        }
+        #addTraineeProgramForm input, #addTraineeProgramForm textarea {
+            padding: 12px 16px;
+            border-radius: 6px;
+            border: 1px solid #cfd8dc;
+            font-size: 1rem;
+            background: #f7fafc;
+            margin-bottom: 4px;
+        }
+        #addTraineeProgramForm input:focus, #addTraineeProgramForm textarea:focus {
+            border: 1.5px solid #7f9cf5;
+            outline: none;
+        }
+        .fade-out {
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .view-btn, .close-btn {
+            min-width: 90px;
+            min-height: 36px;
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 2px 8px #0001;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, transform 0.1s;
+            display: inline-block;
+        }
+        .view-btn {
+            background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%);
+            color: #fff;
+            border: none;
+            margin-right: 0;
+        }
+        .close-btn {
+            background: #f9d6d5;
+            color: #b71c1c;
+            border: none;
+            margin-left: 12px;
+        }
+        .submit-btn {
+            background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%);
+            color: #fff;
+            font-size: 1.3rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 14px;
+            padding: 14px 0;
+            box-shadow: 0 2px 8px #0001;
+            cursor: pointer;
+            margin-top: 12px;
+            width: 100%;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+        }
+        .submit-btn:hover {
+            background: linear-gradient(90deg, #7f9cf5 0%, #b8c6ff 100%);
+            box-shadow: 0 4px 16px rgba(127,156,245,0.16);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .search-bar-container {
+          background: linear-gradient(135deg, #7b7ce4 0%, #a18cd1 100%);
+          border-radius: 24px;
+          padding: 24px 18px 18px 18px;
+          margin-bottom: 28px;
+          box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 16px;
+        }
+        .search-bar-container input,
+        .search-bar-container select {
+          background: rgba(255, 255, 255, 0.18);
+          border: 1.5px solid rgba(255, 255, 255, 0.3);
+          border-radius: 12px;
+          padding: 12px 18px;
+          color: #fff;
+          font-size: 1rem;
+          outline: none;
+          box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.10);
+          backdrop-filter: blur(8px);
+          transition: border 0.2s;
+        }
+        .search-bar-container input::placeholder {
+          color: #e0e0e0;
+          opacity: 1;
+        }
+        .search-bar-container select {
+          appearance: none;
+          -webkit-appearance: none;
+          color: #fff;
+          background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+          background-repeat: no-repeat;
+          background-position-x: 95%;
+          background-position-y: 50%;
+          padding-right: 32px;
+        }
+        .search-bar-container button,
+        .search-bar-container .clear-btn {
+          background: rgba(255, 255, 255, 0.18);
+          border: 1.5px solid rgba(255, 255, 255, 0.3);
+          border-radius: 12px;
+          padding: 12px 24px;
+          color: #fff;
+          font-size: 1rem;
+          cursor: pointer;
+          box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.10);
+          backdrop-filter: blur(8px);
+          transition: background 0.2s, border 0.2s;
+        }
+        .search-bar-container button:hover,
+        .search-bar-container .clear-btn:hover {
+          background: rgba(255, 255, 255, 0.28);
+          border: 1.5px solid #fff;
+        }
+        @media (max-width: 700px) {
+          .search-bar-container {
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 8px;
+          }
+        }
+        .submit-btn-table {
+            background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            min-width: 90px;
+            min-height: 36px;
+            padding: 6px 16px;
+            box-shadow: 0 2px 8px #0001;
+            cursor: pointer;
+            margin-left: 12px;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+            display: inline-block;
+        }
+        .submit-btn-table:hover {
+            background: linear-gradient(90deg, #7f9cf5 0%, #b8c6ff 100%);
+            box-shadow: 0 4px 16px rgba(127,156,245,0.16);
+            transform: translateY(-2px) scale(1.03);
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-content center-header-flex">
+            <span class="logo">🎓 Instructor Portal</span>
+            <button id="logoutBtn" style="margin-left:auto; background:#e74c3c; color:#fff; border:none; border-radius:6px; padding:8px 18px; font-weight:600; cursor:pointer;">Logout</button>
+        </div>
+    </header>
+    <div class="container">
+        <h1>Instructor Dashboard</h1>
+        <div id="programInfo" style="margin-bottom: 24px; font-size: 1.2rem; font-weight: 600; color: #2d3a4a;">Loading program info...</div>
+        <div class="search-bar-container" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+            <h2 style="color: #fff; font-size: 2rem; font-weight: 800; margin: 0; letter-spacing: 1px;">Trainee Programs</h2>
+            <div style="display: flex; width: 100%; gap: 16px; align-items: center;">
+                <input type="text" id="traineeProgramSearch" placeholder="Search by name, ID, department, or mobile..." style="flex: 1; min-width: 220px;" />
+                <button id="clearTraineeProgramSearch" class="clear-btn">Clear</button>
+            </div>
+            <!-- Example selects for department/sort, hidden for now -->
+            <!-- <select><option>All Departments</option></select>
+            <select><option>Sort by Name</option></select> -->
+        </div>
+        <div style="display: flex; justify-content: flex-end; align-items: center; width: 100%; margin: 8px 0 8px 0;">
+            <button id="addTraineeProgramBtn" class="add-program-btn" style="padding: 7px 16px; font-size: 1rem; border-radius: 7px; font-weight: 600;">+ Add Trainee Program</button>
+        </div>
+        <table id="traineeProgramsTable">
+            <thead>
+                <tr>
+                    <th>Trainee Program ID</th>
+                    <th>Program Title</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="traineeProgramsTableBody">
+                <tr><td colspan="4" style="text-align:center; color:#aaa;">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- Modal for Adding Trainee Program -->
+    <div id="addTraineeProgramModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal" id="closeAddTraineeProgramModalBtn">&times;</button>
+            <h3>Add Trainee Program</h3>
+            <form id="addTraineeProgramForm" style="display: flex; flex-direction: column; gap: 12px;">
+                <label for="traineeProgramTitle">Program Title</label>
+                <input type="text" id="traineeProgramTitle" name="traineeProgramTitle" required />
+                <label for="traineeProgramStart">Start Date</label>
+                <input type="date" id="traineeProgramStart" name="traineeProgramStart" required />
+                <label for="traineeProgramEnd">End Date</label>
+                <input type="date" id="traineeProgramEnd" name="traineeProgramEnd" required />
+                <button type="submit" class="submit-btn">Add Program</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Attendance Upload Modal -->
+    <div id="attendanceModal" class="modal-overlay">
+      <div class="modal-content" style="padding: 32px 24px; min-width: 400px;">
+        <button class="close-modal" id="closeAttendanceModalBtn" style="position: absolute; top: 18px; right: 18px; font-size: 2rem; background: none; border: none; cursor: pointer;">&times;</button>
+        <h2 style="text-align: center; font-size: 2rem; font-weight: 700; margin-bottom: 18px;">Upload Attendance</h2>
+        <form id="attendanceForm" enctype="multipart/form-data" class="modal-form" style="display: flex; flex-direction: column; gap: 18px; align-items: stretch;">
+          <label for="attendanceFile" style="font-size: 1.1rem; font-weight: 500; margin-bottom: 4px;">Attendance PDF</label>
+          <input type="file" id="attendanceFile" name="attendanceFile" accept=".pdf" required style="padding: 10px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 1rem; background: #fafbfc;" />
+          <input type="hidden" id="attendanceTraineeProgId" name="trainee_prog_id" />
+          <button type="submit" class="submit-btn">Submit</button>
+        </form>
+      </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            &copy; 2025 Instructor Portal. All rights reserved.
+        </div>
+    </footer>
+
+<script>
+const internshipId = localStorage.getItem('internship_id');
+const instructorId = localStorage.getItem('instructor_id');
+
+// Ensure required IDs are present
+if (!internshipId || !instructorId) {
+    alert('Session expired or not logged in. Please log in again.');
+    window.location.href = 'login.html';
+}
+
+// Fetch and display internship program info
+async function fetchProgramInfo() {
+    const infoDiv = document.getElementById('programInfo');
+    try {
+        const res = await fetch(`http://localhost:8000/instructor/internshipPrograms`);
+        const programs = await res.json();
+        const program = programs.find(p => p.id == internshipId);
+        if (program) {
+            infoDiv.textContent = `Assigned Internship Program: ${program.title} (${program.from_date ? program.from_date.split('T')[0] : ''} to ${program.to_date ? program.to_date.split('T')[0] : ''})`;
+        } else {
+            infoDiv.textContent = 'Assigned Internship Program: Not found';
+        }
+    } catch (err) {
+        infoDiv.textContent = 'Failed to load program info.';
+    }
+}
+fetchProgramInfo();
+
+// Modal logic for Add Trainee Program
+const addTraineeProgramBtn = document.getElementById('addTraineeProgramBtn');
+const addTraineeProgramModal = document.getElementById('addTraineeProgramModal');
+const closeAddTraineeProgramModalBtn = document.getElementById('closeAddTraineeProgramModalBtn');
+addTraineeProgramBtn.addEventListener('click', () => {
+    addTraineeProgramModal.classList.add('active');
+});
+closeAddTraineeProgramModalBtn.addEventListener('click', () => {
+    addTraineeProgramModal.classList.remove('active');
+});
+window.addEventListener('click', (e) => {
+    if (e.target === addTraineeProgramModal) {
+        addTraineeProgramModal.classList.remove('active');
+    }
+});
+
+// Handle Add Trainee Program form submission
+const addTraineeProgramForm = document.getElementById('addTraineeProgramForm');
+addTraineeProgramForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const title = document.getElementById('traineeProgramTitle').value;
+    const startDate = document.getElementById('traineeProgramStart').value;
+    const endDate = document.getElementById('traineeProgramEnd').value;
+    // Always use the IDs from localStorage
+    try {
+        const res = await fetch('http://localhost:8000/instructor/addTraineeProgram', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, startDate, endDate, internship_id: internshipId, instructor_id: instructorId })
+        });
+        const result = await res.json();
+        if (result.success) {
+            alert('Trainee program added successfully!');
+            addTraineeProgramForm.reset();
+            addTraineeProgramModal.classList.remove('active');
+            fetchAndRenderTraineePrograms();
+        } else {
+            alert(result.error || 'Failed to add trainee program');
+        }
+    } catch (err) {
+        alert('Error adding trainee program.');
+    }
+});
+
+// Fetch and render trainee programs
+async function fetchAndRenderTraineePrograms() {
+    const tbody = document.getElementById('traineeProgramsTableBody');
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#aaa;">Loading...</td></tr>';
+    try {
+        const res = await fetch(`http://localhost:8000/instructor/traineePrograms?internship_id=${encodeURIComponent(internshipId)}&instructor_id=${encodeURIComponent(instructorId)}`);
+        const programs = await res.json();
+        if (!Array.isArray(programs) || programs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#aaa;">No trainee programs added yet.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = programs.map(p => `
+            <tr>
+                <td>${p.id || ''}</td>
+                <td>${p.title || ''}</td>
+                <td>${p.startDate ? p.startDate.split('T')[0] : ''}</td>
+                <td>${p.endDate ? p.endDate.split('T')[0] : ''}</td>
+                <td style="display: flex; gap: 12px; align-items: center;">
+                    <button class="view-btn" data-trainee-program-id="${p.id}">View</button>
+                    <button class="close-btn" data-trainee-program-id="${p.id}">Close</button>
+                    <button class="submit-btn-table" data-trainee-program-id="${p.id}">Submit</button>
+                </td>
+            </tr>
+        `).join('');
+        // Add click listeners for view buttons
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const traineeProgramId = this.getAttribute('data-trainee-program-id');
+                localStorage.setItem('trainee_program_id', traineeProgramId);
+                localStorage.setItem('internship_id', internshipId);
+                localStorage.setItem('instructor_id', instructorId);
+                const container = document.querySelector('.container');
+                container.classList.add('fade-out');
+                setTimeout(function() {
+                    window.location.href = 'interndash.html';
+                }, 250);
+            });
+        });
+        // Add click listeners for submit buttons
+        document.querySelectorAll('.submit-btn-table').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const traineeProgId = this.getAttribute('data-trainee-program-id');
+                if (!traineeProgId) return;
+                const confirmed = confirm('Are you sure you want to submit?');
+                if (!confirmed) return;
+                try {
+                    const res = await fetch('http://localhost:8000/instructor/sendAttendanceByEmail', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ trainee_prog_id: traineeProgId })
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        alert('Attendance PDF sent successfully!');
+                    } else {
+                        alert(result.error || 'Failed to send attendance PDF');
+                    }
+                } catch (err) {
+                    alert('Error sending attendance PDF.');
+                }
+            });
+        });
+    } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#e74c3c;">Failed to load trainee programs.</td></tr>';
+    }
+}
+fetchAndRenderTraineePrograms();
+
+// Logout button logic
+const logoutBtn = document.getElementById('logoutBtn');
+logoutBtn.addEventListener('click', function() {
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.clear();
+        window.location.href = 'login.html';
+    }
+});
+
+// Attendance modal logic
+const attendanceModal = document.getElementById('attendanceModal');
+const closeAttendanceModalBtn = document.getElementById('closeAttendanceModalBtn');
+const attendanceForm = document.getElementById('attendanceForm');
+const attendanceFile = document.getElementById('attendanceFile');
+const attendanceTraineeProgId = document.getElementById('attendanceTraineeProgId');
+// Open modal on Close button click
+setTimeout(() => {
+  document.querySelectorAll('.close-btn').forEach(btn => {
+    btn.addEventListener('click', async function() {
+      const traineeProgId = this.getAttribute('data-trainee-program-id');
+      // Fetch all projects for this trainee program
+      try {
+        const res = await fetch(`http://localhost:8000/instructor/projectsForTraineeProgram?trainee_program_id=${encodeURIComponent(traineeProgId)}`);
+        const projects = await res.json();
+        if (!Array.isArray(projects) || projects.length === 0) {
+          // No projects: allow attendance upload
+          attendanceTraineeProgId.value = traineeProgId;
+          attendanceModal.classList.add('active');
+          return;
+        }
+        // Check status for each project
+        let allCompleted = true;
+        for (const p of projects) {
+          const statusRes = await fetch(`http://localhost:8000/instructor/projectFileStatus?project_id=${p.id}`);
+          const statusData = await statusRes.json();
+          if (!statusData.exists) {
+            allCompleted = false;
+            break;
+          }
+        }
+        if (!allCompleted) {
+          alert('All project reports must be submitted before uploading attendance.');
+          return;
+        }
+        attendanceTraineeProgId.value = traineeProgId;
+        attendanceModal.classList.add('active');
+      } catch (err) {
+        alert('Error checking project status.');
+      }
+    });
+  });
+}, 500);
+closeAttendanceModalBtn.addEventListener('click', () => {
+  attendanceModal.classList.remove('active');
+});
+window.addEventListener('click', (e) => {
+  if (e.target === attendanceModal) {
+    attendanceModal.classList.remove('active');
+  }
+});
+attendanceForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  if (!confirm('Are you sure you want to submit?')) return;
+  const file = attendanceFile.files[0];
+  const trainee_prog_id = attendanceTraineeProgId.value;
+  if (!file || !trainee_prog_id) {
+    alert('Please select a PDF and try again.');
+    return;
+  }
+  const formData = new FormData();
+  formData.append('attendanceFile', file);
+  formData.append('trainee_prog_id', trainee_prog_id);
+  try {
+    const res = await fetch('http://localhost:8000/instructor/uploadAttendance', {
+      method: 'POST',
+      body: formData
+    });
+    const result = await res.json();
+    if (result.success) {
+      alert('Attendance uploaded successfully!');
+      attendanceModal.classList.remove('active');
+      attendanceForm.reset();
+    } else if (result.error === 'Attendance already uploaded for this trainee program') {
+      alert('Attendance already uploaded for this trainee program.');
+    } else {
+      alert(result.error || 'Failed to upload attendance');
+    }
+  } catch (err) {
+    alert('Error uploading attendance.');
+  }
+});
+
+// Trainee Program Table Search
+const traineeProgramSearch = document.getElementById('traineeProgramSearch');
+traineeProgramSearch.addEventListener('input', function() {
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#traineeProgramsTableBody tr');
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+    });
+});
+// Add clear button functionality
+const clearTraineeProgramSearch = document.getElementById('clearTraineeProgramSearch');
+clearTraineeProgramSearch.addEventListener('click', function() {
+    traineeProgramSearch.value = '';
+    const event = new Event('input');
+    traineeProgramSearch.dispatchEvent(event);
+});
+
+</script>
+</body>
+</html> 

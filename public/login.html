@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructor Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f2e3fc 0%, #cfd9df 50%, #e2e2e2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-group input:hover {
+            border-color: #c5d0f0;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .instructor-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            .login-header h1 {
+                font-size: 24px;
+            }
+        }
+
+        /* Animation for form elements */
+        .form-group {
+            animation: slideUp 0.6s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="instructor-badge" id="portalBadge">Admin Portal</div>
+            <h1>Welcome </h1>
+            <p id="portalSubtext">Please sign in to your admin account</p>
+        </div>
+        
+        <form id="loginForm" autocomplete="off" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+            <div class="form-group" style="width: 100%; margin-bottom: 18px;">
+                <label for="loginVia" style="font-weight: bold;">Login via:</label>
+                <select id="loginVia" name="loginVia" style="width: 100%; padding: 10px 20px; border-radius: 8px; border: 1.5px solid #b2c7e6; background: rgba(245, 250, 255, 0.85); font-size: 1rem; outline: none; margin-top: 0.2rem; transition: border 0.2s, box-shadow 0.2s; box-shadow: 0 1px 4px rgba(160,180,255,0.08);">
+                    <option value="Admin">Admin</option>
+                    <option value="Instructor">Instructor</option>
+                </select>
+            </div>
+            <div class="form-group" style="width: 100%;">
+                <label for="userId" id="userIdLabel">Admin ID</label>
+                <input type="text" id="adminId" name="adminId" placeholder="Enter your Admin ID" required>
+                <span class="icon"></span>
+            </div>
+            <div class="form-group" style="width: 100%;">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                <span class="icon"></span>
+            </div>
+            <button type="submit" class="login-btn" style="margin-top: 18px; width: 100%;">Sign In</button>
+        </form>
+        
+    </div>
+
+    <script>
+        // Update label, placeholder, and portal badge based on loginVia
+        document.addEventListener('DOMContentLoaded', function () {
+            const loginVia = document.getElementById('loginVia');
+            const adminIdInput = document.getElementById('adminId');
+            const userIdLabel = document.getElementById('userIdLabel');
+            const portalBadge = document.getElementById('portalBadge');
+            const portalSubtext = document.getElementById('portalSubtext');
+            function updateRoleUI() {
+                if (loginVia.value === 'Admin') {
+                    userIdLabel.textContent = 'Admin ID';
+                    adminIdInput.placeholder = 'Enter your Admin ID';
+                    portalBadge.textContent = 'Admin Portal';
+                    portalSubtext.textContent = 'Please sign in to your admin account';
+                    adminIdInput.name = 'adminId';
+                } else {
+                    userIdLabel.textContent = 'Instructor ID';
+                    adminIdInput.placeholder = 'Enter your Instructor ID';
+                    portalBadge.textContent = 'Instructor Portal';
+                    portalSubtext.textContent = 'Please sign in to your instructor account';
+                    adminIdInput.name = 'instructorId';
+                }
+            }
+            loginVia.addEventListener('change', updateRoleUI);
+            updateRoleUI();
+
+            // Login form submit handler
+            const loginForm = document.getElementById('loginForm');
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const role = loginVia.value;
+                const id = adminIdInput.value.trim();
+                const password = document.getElementById('password').value;
+                if (!id || !password) {
+                    alert('Please enter both ID and password.');
+                    return;
+                }
+                let endpoint = '';
+                let payload = {};
+                if (role === 'Admin') {
+                    endpoint = 'http://localhost:8000/admin/login';
+                    payload = { adminId: id, password };
+                } else {
+                    endpoint = 'http://localhost:8000/instructor/login';
+                    payload = { instructorId: id, password };
+                }
+                try {
+                    const res = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        alert('Login successful');
+                        if (role === 'Instructor') {
+                            // Save the instructor's actual ID and internship_id from the response
+                            localStorage.setItem('instructor_id', result.instructor.instructor_id);
+                            localStorage.setItem('internship_id', result.instructor.internship_id);
+                            window.location.href = 'instructor.html';
+                        } else {
+                            // Save admin id or username in localStorage
+                            if (result.admin && result.admin.id) {
+                                localStorage.setItem('admin_id', result.admin.id);
+                            } else if (result.admin && result.admin.username) {
+                                localStorage.setItem('admin_username', result.admin.username);
+                            }
+                            window.location.href = 'admin.html';
+                        }
+                    } else {
+                        alert(result.error || 'Invalid credentials.');
+                    }
+                } catch (err) {
+                    alert('Login failed. Please try again.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
